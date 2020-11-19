@@ -14,6 +14,8 @@
 1. [Overleaf](https://www.overleaf.com/)
 2. [Trello](https://trello.com/pl)
 
+###Linki do gistów:
+
 ---
 
 ![funny meme](https://preview.redd.it/iwo3dlg7vnw51.jpg?width=640&crop=smart&auto=webp&s=7173596003972067649c5f99b773a48facb54e80)
