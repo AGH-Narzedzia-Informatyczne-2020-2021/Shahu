@@ -15,9 +15,10 @@
 2. [Trello](https://trello.com/pl)
 
 ### Linki do gistów:
+
 1. Jakub Hulek:
-  1. https://gist.github.com/HulekJakub/8b69f1d1818b359bf48e9486663b2dbd
-  2.
+    1. https://gist.github.com/HulekJakub/8b69f1d1818b359bf48e9486663b2dbd
+    2.
   
 ---
 
