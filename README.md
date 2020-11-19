@@ -14,8 +14,7 @@
 1. [Overleaf](https://www.overleaf.com/)
 2. [Trello](https://trello.com/pl)
 
-###Linki do gistów:
-
+### Linki do gistów:
 1. Jakub Hulek:
   a)https://gist.github.com/HulekJakub/8b69f1d1818b359bf48e9486663b2dbd
   b)
