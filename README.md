@@ -21,7 +21,7 @@
     2.
 2. Patryk Gęgotek:
     1. [Gist pierwszy](https://gist.github.com/PatrykGegotek/42a88c839b1efd71b78e0ded89a4ba82)
-    2.
+    2. [Gist drugi](https://gist.github.com/PatrykGegotek/8baa1c0e21646951cbeafd9da809d739)
     
 ---
 
