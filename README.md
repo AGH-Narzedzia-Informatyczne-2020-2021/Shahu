@@ -25,6 +25,8 @@
 3. Marcin Kosiba
     1. [Gist 1](https://gist.github.com/kosibamarcin/ea3bcf9e059f2b157c9f3eac7e042cd2)
     2. [Gist 2](https://gist.github.com/kosibamarcin/5850d3ba0b73827b12d101f745bc1354)
+4. Piotr Pyrczak
+    1. https://gist.github.com/ppiotrekp/5ddb25a02ab31c53d3a800b81865945d
     
 ---
 
