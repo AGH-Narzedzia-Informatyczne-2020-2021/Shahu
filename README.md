@@ -22,6 +22,9 @@
 2. Patryk Gęgotek:
     1. [Gist pierwszy](https://gist.github.com/PatrykGegotek/42a88c839b1efd71b78e0ded89a4ba82)
     2. [Gist drugi](https://gist.github.com/PatrykGegotek/8baa1c0e21646951cbeafd9da809d739)
+3. Marcin Kosiba
+    1. [Gist 1](https://gist.github.com/kosibamarcin/ea3bcf9e059f2b157c9f3eac7e042cd2)
+    2. [Gist 2](https://gist.github.com/kosibamarcin/5850d3ba0b73827b12d101f745bc1354)
     
 ---
 
