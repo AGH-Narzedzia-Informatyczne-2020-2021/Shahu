@@ -30,7 +30,6 @@
     2. [Drugi gist](https://gist.github.com/senior-cpp-developer/f1374d0d8386bf23c27d9c8e20ac3eba)
 5. Piotr Pyrczak
     1. [Gist pierwszy] (https://gist.github.com/ppiotrekp/5ddb25a02ab31c53d3a800b81865945d)
-    
 ---
 
 ![funny meme](https://preview.redd.it/iwo3dlg7vnw51.jpg?width=640&crop=smart&auto=webp&s=7173596003972067649c5f99b773a48facb54e80)
