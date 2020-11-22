@@ -25,11 +25,16 @@
 3. Marcin Kosiba
     1. [Gist 1](https://gist.github.com/kosibamarcin/ea3bcf9e059f2b157c9f3eac7e042cd2)
     2. [Gist 2](https://gist.github.com/kosibamarcin/5850d3ba0b73827b12d101f745bc1354)
+<<<<<<< Updated upstream
 4. Dawid Słomnicki
     1. [Pierwszy gist](https://gist.github.com/senior-cpp-developer/a4ba9499f8433d27156805074f505c8e)
     2. [Drugi gist](https://gist.github.com/senior-cpp-developer/f1374d0d8386bf23c27d9c8e20ac3eba)
 5. Piotr Pyrczak
     1. [Gist pierwszy] (https://gist.github.com/ppiotrekp/5ddb25a02ab31c53d3a800b81865945d)
+=======
+
+    
+>>>>>>> Stashed changes
 ---
 
 ![funny meme](https://preview.redd.it/iwo3dlg7vnw51.jpg?width=640&crop=smart&auto=webp&s=7173596003972067649c5f99b773a48facb54e80)
