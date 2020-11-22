@@ -25,7 +25,6 @@
 3. Marcin Kosiba
     1. [Gist 1](https://gist.github.com/kosibamarcin/ea3bcf9e059f2b157c9f3eac7e042cd2)
     2. [Gist 2](https://gist.github.com/kosibamarcin/5850d3ba0b73827b12d101f745bc1354)
-<<<<<<< Updated upstream
 4. Dawid Słomnicki
     1. [Pierwszy gist](https://gist.github.com/senior-cpp-developer/a4ba9499f8433d27156805074f505c8e)
     2. [Drugi gist](https://gist.github.com/senior-cpp-developer/f1374d0d8386bf23c27d9c8e20ac3eba)
