@@ -33,7 +33,7 @@
     2. [Gist drugi] (https://gist.github.com/ppiotrekp/f1011973e3de21f12cec79fa91ab2f0b)
 6. Michał Pałucki
     I. [Gist pierwszy](https://gist.github.com/uknowmee/495760aa15c55c4114b17cf2889a7048)
-   II. [Gist drugi](https://gist.github.com/uknowmee/69075e5ab6b0d57a0d1639bfa7c72304)
+    II. [Gist drugi](https://gist.github.com/uknowmee/69075e5ab6b0d57a0d1639bfa7c72304)
 =======
 
     
