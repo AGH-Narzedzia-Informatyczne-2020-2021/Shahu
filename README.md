@@ -29,8 +29,8 @@
     1. [Pierwszy gist](https://gist.github.com/senior-cpp-developer/a4ba9499f8433d27156805074f505c8e)
     2. [Drugi gist](https://gist.github.com/senior-cpp-developer/f1374d0d8386bf23c27d9c8e20ac3eba)
 5. Piotr Pyrczak
-    1. [Gist pierwszy] (https://gist.github.com/ppiotrekp/5ddb25a02ab31c53d3a800b81865945d)
-    2. [Gist drugi] (https://gist.github.com/ppiotrekp/f1011973e3de21f12cec79fa91ab2f0b)
+    1. [Gist pierwszy](https://gist.github.com/ppiotrekp/5ddb25a02ab31c53d3a800b81865945d)
+    2. [Gist drugi](https://gist.github.com/ppiotrekp/f1011973e3de21f12cec79fa91ab2f0b)
 6. Michał Pałucki
     1. [Gist pierwszy](https://gist.github.com/uknowmee/495760aa15c55c4114b17cf2889a7048)
     2. [Gist drugi](https://gist.github.com/uknowmee/69075e5ab6b0d57a0d1639bfa7c72304)
