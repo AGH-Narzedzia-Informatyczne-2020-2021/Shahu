@@ -17,8 +17,8 @@
 ### Linki do gistów:
 
 1. Jakub Hulek:
-    1. https://gist.github.com/HulekJakub/8b69f1d1818b359bf48e9486663b2dbd
-    2.
+    1. [Gist pierwszy](https://gist.github.com/HulekJakub/8b69f1d1818b359bf48e9486663b2dbd)
+    2. [Gist drugi](https://gist.github.com/HulekJakub/50cc6c078b5e2d67ff8769bc993c48b2)
 2. Patryk Gęgotek:
     1. [Gist pierwszy](https://gist.github.com/PatrykGegotek/42a88c839b1efd71b78e0ded89a4ba82)
     2. [Gist drugi](https://gist.github.com/PatrykGegotek/8baa1c0e21646951cbeafd9da809d739)
