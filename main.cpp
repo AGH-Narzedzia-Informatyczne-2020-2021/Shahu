@@ -6,7 +6,17 @@
 
 int main()
 {
-    shahu::HelloWorld::printHello();
+    //shahu::HelloWorld::printHello();
+    std::cout << std::endl << "Hey! Nice to see you in Shahu Game!" << std::endl << std::endl;
+    std::cout << "  Makers:" << std::endl << std::endl;
+    std::cout << "      Dawid Slomnicki," << std::endl;
+    std::cout << "      Jakub Hulek," << std::endl;
+    std::cout << "      Marcin Kosiba," << std::endl;
+    std::cout << "      Michal Palucki," << std::endl;
+    std::cout << "      Patryk Gegotek," << std::endl;
+    std::cout << "      Piotr Pyrczak." << std::endl;
+    std::cout << "                                               All rights reserved." << std::endl;
+
 
     //---------------INITIALIZATION------------
     if(!al_init())
