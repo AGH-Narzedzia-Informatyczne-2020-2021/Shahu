@@ -6,6 +6,7 @@ namespace shahu {
     public:
         virtual double update() = 0;
         virtual double render() = 0;
+        virtual void load() = 0;
     };
 }
 
