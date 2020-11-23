@@ -4,7 +4,8 @@
 namespace shahu {
     class View {
     public:
-        virtual double render() = 0;
+        virtual bool render() = 0;
+        virtual bool load() = 0;
     };
 }
 
