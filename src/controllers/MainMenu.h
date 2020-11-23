@@ -6,9 +6,9 @@
 namespace shahu {
     class MainMenu : shahu::Controller {
     public:
-        bool update();
-        bool render();
-        static void wczytaj();
+        virtual double update();
+        virtual double render();
+        static void load();
     };
 }
 

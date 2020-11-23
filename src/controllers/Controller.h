@@ -4,8 +4,9 @@
 namespace shahu {
     class Controller {
     public:
-        virtual bool update() = 0;
-        virtual bool render() = 0;
+        virtual double update() = 0;
+        virtual double render() = 0;
+        virtual void load() = 0;
     };
 }
 
