@@ -18,5 +18,6 @@ namespace shahu{
         ALLEGRO_BITMAP *button3;
     };
 }
+//komentarz
 
 #endif //SHAHU_MAINMENU_H
