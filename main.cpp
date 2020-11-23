@@ -6,6 +6,10 @@
 
 int main()
 {
+feat/mainMenu
+    shahu::HelloWorld::printHello();
+    //konflikt
+    //KONFLIKT
     //shahu::HelloWorld::printHello();
     std::cout << std::endl << "Hey! Nice to see you in Shahu Game!" << std::endl << std::endl;
     std::cout << "  Makers:" << std::endl << std::endl;
@@ -17,6 +21,7 @@ int main()
     std::cout << "      Piotr Pyrczak." << std::endl;
     std::cout << "                                               All rights reserved." << std::endl;
 
+dev
 
     //---------------INITIALIZATION------------
     if(!al_init())
