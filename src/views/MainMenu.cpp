@@ -1,6 +1,3 @@
-//
-// Created by Marcin Kosiba on 23.11.2020.
-//
 #include "MainMenu.h"
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
