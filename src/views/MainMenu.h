@@ -7,7 +7,7 @@ namespace shahu{
     class MainMenu : shahu::View
     {
     public:
-        virtual double render() = 0;
+        virtual bool render() = 0;
         bool load();
     };
 }
