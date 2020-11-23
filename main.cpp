@@ -7,6 +7,7 @@
 int main()
 {
     shahu::HelloWorld::printHello();
+    //konflikt
 
     //---------------INITIALIZATION------------
     if(!al_init())
