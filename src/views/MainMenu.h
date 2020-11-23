@@ -2,6 +2,7 @@
 #define SHAHU_MAINMENU_H
 
 #include "View.h"
+#include <allegro5/bitmap.h>
 
 namespace shahu{
     class MainMenu : shahu::View
@@ -9,6 +10,12 @@ namespace shahu{
     public:
         bool render();
         bool load();
+    private:
+        ALLEGRO_BITMAP *tlo;
+        ALLEGRO_BITMAP *title;
+        ALLEGRO_BITMAP *button1;
+        ALLEGRO_BITMAP *button2;
+        ALLEGRO_BITMAP *button3;
     };
 }
 
