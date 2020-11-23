@@ -3,7 +3,7 @@ project(Shahu)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Shahu main.cpp shahu.h src/HelloWorld.cpp)
+add_executable(Shahu main.cpp shahu.h src/HelloWorld.cpp src/controllers/controllers.h src/views/views.h)
 
 
 INCLUDE_DIRECTORIES(  allegro/include )
