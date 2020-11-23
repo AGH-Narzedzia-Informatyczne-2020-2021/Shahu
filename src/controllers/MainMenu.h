@@ -8,7 +8,7 @@ namespace shahu {
     public:
         virtual double update();
         virtual double render();
-        static void menu();
+        static void wczytaj();
     };
 }
 
