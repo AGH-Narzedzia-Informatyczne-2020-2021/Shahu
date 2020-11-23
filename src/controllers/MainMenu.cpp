@@ -5,7 +5,7 @@
 
 using namespace shahu;
 
-void MainMenu::update()
+void MainMenu::menu()
 {
     ALLEGRO_BITMAP *tlo = al_load_bitmap("./assets/menu/tlo.png");
     ALLEGRO_BITMAP *title = al_load_bitmap("./assets/menu/Title.png");
