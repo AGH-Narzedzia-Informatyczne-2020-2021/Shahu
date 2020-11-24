@@ -12,7 +12,7 @@ int main()
     std::cout << "  Makers:" << std::endl << std::endl;
     std::cout << "      Dawid Slomnicki," << std::endl;
     std::cout << "      Jakub Hulek," << std::endl;
-    std::cout << "      Marcin Kosiba," << std::endl;
+    std::cout << "      Marcin Kosiba," << std::endl;  //komentarz
     std::cout << "      Michal Palucki," << std::endl;
     std::cout << "      Patryk Gegotek," << std::endl;
     std::cout << "      Piotr Pyrczak." << std::endl;
