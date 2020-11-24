@@ -13,7 +13,7 @@ int main()
     std::cout << "      Dawid Slomnicki," << std::endl;
     std::cout << "      Jakub Hulek," << std::endl;
     std::cout << "      Marcin Kosiba," << std::endl;  //komentarz
-    std::cout << "      Michal Palucki," << std::endl;
+    std::cout << "      Michal Palucki," << std::endl; 
     std::cout << "      Patryk Gegotek," << std::endl;
     std::cout << "      Piotr Pyrczak." << std::endl;
     std::cout << "                                               All rights reserved." << std::endl;
@@ -24,7 +24,7 @@ int main()
         std::cout << "couldn't initialize allegro" << std::endl;
         return 1;
     }
-
+//komenta
     if(!al_install_keyboard())
     {
         std::cout << "couldn't initialize keyboard\n" << std::endl;
