@@ -6,7 +6,6 @@
 
 int main()
 {
-feat/mainMenu
     shahu::HelloWorld::printHello();
     //konflikt
     //KONFLIKT
@@ -20,8 +19,6 @@ feat/mainMenu
     std::cout << "      Patryk Gegotek," << std::endl;
     std::cout << "      Piotr Pyrczak." << std::endl;
     std::cout << "                                               All rights reserved." << std::endl;
-
-dev
 
     //---------------INITIALIZATION------------
     if(!al_init())
