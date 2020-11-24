@@ -9,7 +9,7 @@ int main()
     shahu::HelloWorld::printHello();
 
     std::cout << std::endl << "Hey! Nice to see you in Shahu Game!" << std::endl << std::endl;
-    std::cout << "  Makers:" << std::endl << std::endl << std::endl;
+    std::cout << "  Makers:" << std::endl << std::endl;     //komentarz próbny
     std::cout << "      Dawid Slomnicki," << std::endl;
     std::cout << "      Jakub Hulek," << std::endl;
     std::cout << "      Marcin Kosiba," << std::endl;
