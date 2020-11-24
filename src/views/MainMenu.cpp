@@ -12,7 +12,6 @@ bool MainMenu::load()
     button1 = al_load_bitmap("./assets/menu/Przycisk_graj.png");
     button2 = al_load_bitmap("./assets/menu/ustawienia.png");
     button3 = al_load_bitmap("./assets/menu/wyjdz.png");
-    //Tak jak Pan Jezus powiedzial
 
     return true;
 }

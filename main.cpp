@@ -7,9 +7,7 @@
 int main()
 {
     shahu::HelloWorld::printHello();
-    //konflikt
-    //KONFLIKT
-    //shahu::HelloWorld::printHello();
+
     std::cout << std::endl << "Hey! Nice to see you in Shahu Game!" << std::endl << std::endl;
     std::cout << "  Makers:" << std::endl << std::endl;
     std::cout << "      Dawid Slomnicki," << std::endl;
