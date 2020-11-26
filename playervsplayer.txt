@@ -171,6 +171,9 @@ void whiteFlightBeat(char b[8][8]){
         if (b[6][x]=='P' || b[6][x]=='W' || b[6][x]=='S' || b[6][x]=='G' || b[6][x]=='H' || b[6][x]=='K'){
             whiteFlight[x]=0;
         }
+        if (b[6][x]=='1'){
+            whiteFlight[x]=0;
+        }
     }
 }
 
@@ -180,10 +183,10 @@ void blackFlightBeatBeforeMove(char b[8][8]){//we are checking if there is a pos
     int x;
     for (x=0; x<8; x++) {
         if (b[1][x] == 'P' && b[3][x] == ' ') {   //if the pawn has not made a move, and can move two fields forward,
-            whiteFlight[x] ='P';                  //the possibility of killing the black in flight is setting as true
+            blackFlight[x] ='P';                  //the possibility of killing the black in flight is setting as true
         }
         else {
-            whiteFlight[x] ='X';                  //else its setting as false
+            blackFlight[x] ='X';                  //else its setting as false
         }
     }
 }
@@ -194,10 +197,10 @@ void blackFlightBeat(char b[8][8]){//we are checking if we can kill black in fli
     int x;
     for (x=0; x<8; x++) {
         if (b[1][x]==' ' && b[3][x]!='P'){
-            whiteFlight[x]='X';
+            blackFlight[x]='X';
         }
         if (b[3][x]=='1' || b[3][x]=='5' || b[3][x]=='4' || b[3][x]=='3' || b[3][x]=='9' || b[3][x]=='0'){
-            whiteFlight[x]='X';
+            blackFlight[x]='X';
         }
     }
 }
@@ -529,11 +532,11 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             }
         }
         if (i==4){
-            if (k==i+1 && l==j-1 && board[i][j-1]=='1' && board[k][l]==' ' && whiteFlight[l]=='1'){
+            if (k==i+1 && l==j-1 && board[i][j-1]=='1' && board[k][l]==' ' && whiteFlight[l]==1){
                 board[i][j-1]=' ';
                 return 1;
             }
-            if (k==i+1 && l==j+1 && board[i][j+1]=='1' && board[k][l]==' ' && whiteFlight[l]=='1'){
+            if (k==i+1 && l==j+1 && board[i][j+1]=='1' && board[k][l]==' ' && whiteFlight[l]==1){
                 board[i][j+1]=' ';
                 return 1;
             }
@@ -1596,7 +1599,7 @@ void blackMove(char b[8][8]){
         printf("Type square from which u wanna make a move:");
         scanf("%d %d", &i, &j);
         //check if player typed co-ordinates of black piece
-        if (b[i][j] == 'P' || b[i][j] == 'W' || b[i][j] == 'S' || b[i][j] == 'G' || b[i][j] == 'H' || b[i][j] == 'P') {
+        if (b[i][j] == 'P' || b[i][j] == 'W' || b[i][j] == 'S' || b[i][j] == 'G' || b[i][j] == 'H' || b[i][j] == 'K') {
             preMove = b[i][j];
             printf("Type square to which u wanna make a move:");
             scanf("%d %d", &k, &l);
