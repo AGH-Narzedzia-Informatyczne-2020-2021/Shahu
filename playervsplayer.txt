@@ -1,7 +1,20 @@
 #include <stdio.h>
-char board[8][8];
 
+char board[8][8];                               //name says, its board xD
 
+//tells if we can do a castle
+int castleWhiteLeft=0;                          //if 0 we can do long white castle
+int castleWhiteRight=0;                         //if 0 we can do short white castle
+int castleWhiteKing=0;                          //if 0 we can do white castle
+int castleBlackLeft=0;                          //if 0 we can do long black castle
+int castleBlackRight=0;                         //if 0 we can do short black castle
+int castleBlackKing=0;                          //if 0 we can do black castle
+
+//tells if we can do a flight kill
+int whiteFlight[8]={1,1,1,1,1,1,1,1};           //only if certain whiteFlight=1 we can kill white in flight on that width
+char blackFlight[8]="PPPPPPPP";                 //only if certain blackFlight=P we can kill black in flight on that width
+
+//here u choose which type of game u wanna play
 int start(){
     int type;
     printf("Hey, nice to see you!\nDo you wanna play chess against my Pc algorithm?\n-->If no, and you wanna play against player type: (1)\n-->If yes type: (2)\n-->");
@@ -13,6 +26,7 @@ int start(){
     }
 }
 
+//cleaning the board
 void clear(char b[8][8]){
     int i, j;
     for (i = 0;  i<8 ; i++) {
@@ -22,6 +36,7 @@ void clear(char b[8][8]){
     }
 }
 
+//printing the board
 void write(char b[8][8]){
     int i, j;
     printf("\n Plansza:\n");
@@ -44,35 +59,169 @@ void write(char b[8][8]){
     printf("*************************************\n");
 }
 
-void beforeMoves(char b[8][8]){
-    int j;
-    for (j = 0; j < 8; j++) {
-        b[1][j] = 'P';
-        b[6][j]='1';
+//setting pieces on the board
+void beforeMoves(char b[8][8]){                 //every x, y, z, c are used in all kind of "for" X IS NOT WIDTH AND Y IS NOT HIGH
+    int x;
+    for (x = 0; x < 8; x++) {
+        b[1][x] = 'P';
+        b[6][x]='1';
     }
     b[0][0]='W'; b[0][7]='W'; b[0][1]='S'; b[0][6]='S'; b[0][2]='G'; b[0][5]='G'; b[0][3]='H'; b[0][4]='K';
     b[7][0]='5'; b[7][7]='5'; b[7][1]='4'; b[7][6]='4'; b[7][2]='3'; b[7][5]='3'; b[7][3]='9'; b[7][4]='0';
+
     //WSGHKGSW
     //PPPPPPPP
 
-    //pppppppp
-    //wsghkgsw
+    //11111111
+    //54390345
 }
 
+//switching the white pawn
+//if we are at 0 high with white pawn then in whiteMove function we are running this one
+void whitePawnSwitch(int k, int l){
+    int exchange;
+    printf("For what you wanna change your pawn!-->");
+    scanf("%d", &exchange);             //k and l are positions after move
+    if (exchange==1) {                          //k is telling the high and l is telling the width
+        board[k][l]='1';                        //echange for pawn
+    }
+    if (exchange==5) {
+        board[k][l]='5';                        //echange for rook
+    }
+    if (exchange==4) {
+        board[k][l]='4';                        //echange for knight
+    }
+    if (exchange==3) {
+        board[k][l]='3';                        //echange for bishop
+    }
+    if (exchange==9) {
+        board[k][l]='9';                        //echange for queen
+    }
+}
+
+//switching the black pawn
+//if we are at 7 high with black pawn then in blackMove function we are running this one
+void blackPawnSwitch(int k, int l){
+    char exchange;
+    printf("For what you wanna change your pawn!-->");
+    scanf("%c", &exchange);             //k and l are positions after move
+    if (exchange=='P') {                        //k is telling the high and l is telling the width
+        board[k][l]='P';                        //echange for pawn
+    }
+    if (exchange=='W') {
+        board[k][l]='W';                        //echange for rook
+    }
+    if (exchange=='S') {
+        board[k][l]='S';                        //echange for knight
+    }
+    if (exchange=='G') {
+        board[k][l]='G';                        //echange for bishop
+    }
+    if (exchange=='H') {
+        board[k][l]='H';                        //echange for queen
+    }
+}
+
+void castleCheckWhite(char b[8][8]){
+    if (b[7][0]!='5'){
+        castleWhiteLeft++;
+    }
+    if (b[7][7]!='5'){
+        castleWhiteRight++;
+    }
+    if (b[7][4]!='0'){
+        castleWhiteKing++;
+    }
+}
+
+void castleCheckBlack(char b[8][8]){
+    if (b[0][0]!='W'){
+        castleBlackLeft++;
+    }
+    if (b[0][7]!='W'){
+        castleBlackRight++;
+    }
+    if (b[0][4]!='K'){
+        castleBlackKing++;
+    }
+}
+
+//before every white move
+//checks if its a possibility to kill white pawn by black pawn NEXT BLACK MOVE! in flight
+void whiteFlightBeatBeforeMove(char b[8][8]){
+    int x;
+    for (x=0; x<8; x++) {
+        if (b[6][x] == '1' && b[4][x] == ' ') {   //if the pawn has not made a move, and can move two fields forward,
+            whiteFlight[x] = 1;                   //the possibility of killing the white in flight is setting as true
+        }
+        else {
+            whiteFlight[x] = 0;                   //else its setting as false
+        }
+    }
+}
+
+//after every white move
+//checks if black cant kill white in flight
+void whiteFlightBeat(char b[8][8]){
+    int x;
+    for (x=0; x<8; x++) {
+        if (b[6][x]==' ' && b[4][x]!='1'){
+            whiteFlight[x]=0;
+        }
+        if (b[6][x]=='P' || b[6][x]=='W' || b[6][x]=='S' || b[6][x]=='G' || b[6][x]=='H' || b[6][x]=='K'){
+            whiteFlight[x]=0;
+        }
+    }
+}
+
+//before every black move
+//checks if its a possibility to kill black pawn by white pawn NEXT WHITE MOVE! in flight
+void blackFlightBeatBeforeMove(char b[8][8]){//we are checking if there is a possibility to kill black in flight
+    int x;
+    for (x=0; x<8; x++) {
+        if (b[1][x] == 'P' && b[3][x] == ' ') {   //if the pawn has not made a move, and can move two fields forward,
+            whiteFlight[x] ='P';                  //the possibility of killing the black in flight is setting as true
+        }
+        else {
+            whiteFlight[x] ='X';                  //else its setting as false
+        }
+    }
+}
+
+//after every black move
+//checks if white cant kill black in flight
+void blackFlightBeat(char b[8][8]){//we are checking if we can kill black in flight
+    int x;
+    for (x=0; x<8; x++) {
+        if (b[1][x]==' ' && b[3][x]!='P'){
+            whiteFlight[x]='X';
+        }
+        if (b[3][x]=='1' || b[3][x]=='5' || b[3][x]=='4' || b[3][x]=='3' || b[3][x]=='9' || b[3][x]=='0'){
+            whiteFlight[x]='X';
+        }
+    }
+}
+
+//is started by whiteMove function if there is possibility for certain move
+//check if player made a gg move, if it returns 1 the move was gg
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
 int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
     int temp, temp1;
-    if (preMove=='1'){//pawn
+    if (preMove=='1'){//pawn moves, 1 forward, kill slant
         if (i==6){
             if (k==i-2 && l==j && afterMove==' ' || k==i-1 && j==l && afterMove==' '){
                 return 1;
             }
         }
-        if (i<=3){
-            if (k==i-1 && l==j-1 && board[i][j-1]=='P'){
+        if (i==3){
+            if (k==i-1 && l==j-1 && board[i][j-1]=='P' && board[k][l]==' ' && blackFlight[l]=='P'){
                 board[i][j-1]=' ';
                 return 1;
             }
-            if (k==i-1 && l==j+1 && board[i][j+1]=='P'){
+            if (k==i-1 && l==j+1 && board[i][j+1]=='P' && board[k][l]==' ' && blackFlight[l]=='P'){
                 board[i][j+1]=' ';
                 return 1;
             }
@@ -92,7 +241,15 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='5'){//rook
+    if (preMove=='5'){//rook moves
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[5][5][5] 5 [5][5][5][5]
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[ ][ ][ ][5][ ][ ][ ][ ]
+//[ ][ ][ ][5][ ][ ][ ][ ]
         if (i>k && j==l){
             temp=i-1;
             while (1){
@@ -144,7 +301,15 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='4'){//knight
+    if (preMove=='4'){//knight moves
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][4][ ][4][ ][ ][ ]
+//[ ][4][ ][ ][ ][4][ ][ ]
+//[ ][ ][ ] 4 [ ][ ][ ][ ]
+//[ ][4][ ][ ][ ][4][ ][ ]
+//[ ][ ][4][ ][4][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
         if (i-1==k && j+2==l){
             return 1;
         }
@@ -170,7 +335,15 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
             return 1;
         }
     }
-    if (preMove=='3'){//bishop
+    if (preMove=='3'){//bishop moves
+//[ ][ ][ ][ ][ ][ ][ ][3]
+//[3][ ][ ][ ][ ][ ][3][ ]
+//[ ][3][ ][ ][ ][3][ ][ ]
+//[ ][ ][3][ ][3][ ][ ][ ]
+//[ ][ ][ ] 3 [ ][ ][ ][ ]
+//[ ][ ][3][ ][3][ ][ ][ ]
+//[ ][3][ ][ ][ ][3][ ][ ]
+//[3][ ][ ][ ][ ][ ][3][ ]
         if (i>k && j<l){
             for (temp=i-1, temp1=j+1; ; temp--, temp1++) {
                     if (temp1==l && temp==k){
@@ -212,7 +385,15 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='9'){//queen
+    if (preMove=='9'){//queen moves
+//[ ][ ][ ][9][ ][ ][ ][9]
+//[9][ ][ ][9][ ][ ][9][ ]
+//[ ][9][ ][9][ ][9][ ][ ]
+//[ ][ ][9][9][9][ ][ ][ ]
+//[9][9][9] 9 [9][9][9][9]
+//[ ][ ][9][9][9][ ][ ][ ]
+//[ ][9][ ][9][ ][9][ ][ ]
+//[9][ ][ ][9][ ][ ][9][ ]
         if (i>k && j==l){
             temp=i-1;
             while (1){
@@ -304,9 +485,9 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='0'){//king
-        if (i==k && j+1==l){
-            return 1;
+    if (preMove=='0'){//king moves                      //[0][0][0]
+        if (i==k && j+1==l){                            //[0] 0 [0]
+            return 1;                                   //[0][0][0]
         }
         if (i+1==k && j+1==l){
             return 1;
@@ -333,20 +514,26 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
     return 0;
 }
 
+//is started by blackMove function if there is possibility for certain move
+//check if player made a gg move, if it returns 1 the move was gg
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
 int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
     int temp, temp1;
-    if (preMove=='P'){//pawn
+    if (preMove=='P'){//pawn moves, 1 forward, kill slant
         if (i==1){
             if (k==i+2 && l==j && afterMove==' ' || k==i+1 && j==l && afterMove==' '){
                 return 1;
             }
         }
-        if (i>=4){
-            if (k==i+1 && l==j-1 && board[i][j-1]=='1'){
+        if (i==4){
+            if (k==i+1 && l==j-1 && board[i][j-1]=='1' && board[k][l]==' ' && whiteFlight[l]=='1'){
                 board[i][j-1]=' ';
                 return 1;
             }
-            if (k==i+1 && l==j+1 && board[i][j+1]=='1'){
+            if (k==i+1 && l==j+1 && board[i][j+1]=='1' && board[k][l]==' ' && whiteFlight[l]=='1'){
                 board[i][j+1]=' ';
                 return 1;
             }
@@ -366,7 +553,15 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='W'){//rook
+    if (preMove=='W'){//rook moves
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[W][W][W] W [W][W][W][W]
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[ ][ ][ ][W][ ][ ][ ][ ]
+//[ ][ ][ ][W][ ][ ][ ][ ]
         if (i>k && j==l){
             temp=i-1;
             while (1){
@@ -418,7 +613,15 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='S'){//knight
+    if (preMove=='S'){//knight moves
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][S][ ][S][ ][ ][ ]
+//[ ][S][ ][ ][ ][S][ ][ ]
+//[ ][ ][ ] S [ ][ ][ ][ ]
+//[ ][S][ ][ ][ ][S][ ][ ]
+//[ ][ ][S][ ][S][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
         if (i-1==k && j+2==l){
             return 1;
         }
@@ -444,7 +647,15 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             return 1;
         }
     }
-    if (preMove=='G'){//bishop
+    if (preMove=='G'){//bishop moves
+//[ ][ ][ ][ ][ ][ ][ ][G]
+//[G][ ][ ][ ][ ][ ][G][ ]
+//[ ][G][ ][ ][ ][G][ ][ ]
+//[ ][ ][G][ ][G][ ][ ][ ]
+//[ ][ ][ ] G [ ][ ][ ][ ]
+//[ ][ ][G][ ][G][ ][ ][ ]
+//[ ][G][ ][ ][ ][G][ ][ ]
+//[G][ ][ ][ ][ ][ ][G][ ]
         if (i>k && j<l){
             for (temp=i-1, temp1=j+1; ; temp--, temp1++) {
                 if (temp1==l && temp==k){
@@ -486,7 +697,15 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='H'){//queen
+    if (preMove=='H'){//queen moves
+//[ ][ ][ ][H][ ][ ][ ][H]
+//[H][ ][ ][H][ ][ ][H][ ]
+//[ ][H][ ][H][ ][H][ ][ ]
+//[ ][ ][H][H][H][ ][ ][ ]
+//[H][H][H] H [H][H][H][H]
+//[ ][ ][H][H][H][ ][ ][ ]
+//[ ][H][ ][H][ ][H][ ][ ]
+//[H][ ][ ][H][ ][ ][H][ ]
         if (i>k && j==l){
             temp=i-1;
             while (1){
@@ -578,9 +797,9 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
             }
         }
     }
-    if (preMove=='K'){//king
-        if (i==k && j+1==l){
-            return 1;
+    if (preMove=='K'){//king moves                      //[K][K][K]
+        if (i==k && j+1==l){                            //[K] K [K]
+            return 1;                                   //[K][K][K]
         }
         if (i+1==k && j+1==l){
             return 1;
@@ -607,17 +826,26 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
     return 0;
 }
 
+//is started by whiteMove function after "making test move"
+//check if player made a gg move, if it returns 0 the move was gg
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
+//x1 and y1 are used to remember where is the white king
+//x2 and y2 are used to remember where piece is
+//count is used to remember how big is free space between king and piece
 int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l){
     char tempBoard[8][8];
-    int x, y, z, c, x1, y1, x2, y2, count;      // x, y and z, c are used in almost every "for"
-    for (x = 0; x < 8; x++) {                   // x1 and y1 are used to remember where is the white king
-        for (y = 0; y < 8; y++) {               //x2 and y2 are used to remember where piece is
+    int x, y, z, c, x1, y1, x2, y2, count;
+    for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
+        for (y = 0; y < 8; y++) {
             tempBoard[x][y]=board[x][y];
         }
     }
-    tempBoard[i][j]=' ';
-    tempBoard[k][l]=preMove;
-    for (x = 0; x < 8; x++) {
+    tempBoard[i][j]=' ';                        //cleaning the place before move
+    tempBoard[k][l]=preMove;                    //making the move
+    for (x = 0; x < 8; x++) {                   //looking for white king
         for (y = 0; y < 8; y++) {
             if (tempBoard[x][y]=='0'){
                 x1=x;
@@ -625,18 +853,18 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
             }
         }
     }
-    //pawn check
+    //checking if pawn can kill king
     if (tempBoard[x1-1][y1-1]=='P' || tempBoard[x1-1][y1+1]=='P'){
         return 1;
     }
-    //rock check
+    //checking if rook can kill king
     for (x = 0; x < 8; x++) {
-        if (tempBoard[x][y1]=='W'){
+        if (tempBoard[x][y1]=='W'){ //looking for rock
             count=0;
             x2=x;
-            if (x1>x2){
-                for (z=x2+1; z<x1; z++) {
-                    if (tempBoard[z][y1]==' '){
+            if (x1>x2){                             //situation:    W
+                for (z=x2+1; z<x1; z++) {           //              0
+                    if (tempBoard[z][y1]==' '){     //rook is above the king
                         count++;
                     }
                     if (count==x1-x2-1){
@@ -647,9 +875,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                     return 1;
                 }
             }
-            if (x1<x2){
-                for (z=x1+1; z<x2; z++) {
-                    if (tempBoard[z][y1]==' '){
+            if (x1<x2){                                 //situation:    O
+                for (z=x1+1; z<x2; z++) {               //              W
+                    if (tempBoard[z][y1]==' '){         //rook is under the king
                         count++;
                     }
                     if (count==x2-x1-1){
@@ -664,8 +892,8 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
         if (tempBoard[x1][x]=='W'){
             count=0;
             y2=x;
-            if (y1>y2){
-                for (c=y2+1; c<y1; c++) {
+            if (y1>y2){                             //situation:    WO
+                for (c=y2+1; c<y1; c++) {           //rook is on the left of the king
                     if (tempBoard[x1][c]==' '){
                         count++;
                     }
@@ -677,8 +905,8 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                     return 1;
                 }
             }
-            if (y1<y2){
-                for (c=y1+1; c<y2; c++) {
+            if (y1<y2){                             //situation:    OW
+                for (c=y1+1; c<y2; c++) {           //rook is on the right of the king
                     if (tempBoard[x1][c]==' '){
                         count++;
                     }
@@ -692,7 +920,15 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
             }
         }
     }
-    //knight check
+    //knight check, any of those:
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][S][ ][S][ ][ ][ ]
+//[ ][S][ ][ ][ ][S][ ][ ]
+//[ ][ ][ ] 0 [ ][ ][ ][ ]
+//[ ][S][ ][ ][ ][S][ ][ ]
+//[ ][ ][S][ ][S][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
     if (tempBoard[x1+2][y1+1]=='S'){
         return 1;
     }
@@ -720,13 +956,13 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
     //bishop check
     for (x=0; x<8; x++) {
         for (y=0; y<8; y++) {
-            if (tempBoard[x][y]=='G'){
+            if (tempBoard[x][y]=='G'){                              //looking for bishop
                 count=0;
                 x2=x;
                 y2=y;
-                if (x1>x2 && y1<y2) {
-                    if (x1-x2==y2-y1) {
-                        for (z=0; z<y2-y1-1; z++) {
+                if (x1>x2 && y1<y2) {                               //situation:    G
+                    if (x1-x2==y2-y1) {                             //             O
+                        for (z=0; z<y2-y1-1; z++) {                 //bishop on the top right of the king
                             if (tempBoard[x1-1-z][y1+1+z]==' '){
                                 count++;
                             }
@@ -739,9 +975,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                         }
                     }
                 }
-                if (x1<x2 && y1<y2) {
-                    if (x2-x1==y2-y1) {
-                        for (z=0; z<y2-y1-1; z++) {
+                if (x1<x2 && y1<y2) {                               //situation:    O
+                    if (x2-x1==y2-y1) {                             //               G
+                        for (z=0; z<y2-y1-1; z++) {                 //bishop on the down right of the king
                             if (tempBoard[x1+1+z][y1+1+z]==' '){
                                 count++;
                             }
@@ -754,9 +990,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                         }
                     }
                 }
-                if (x1<x2 && y1>y2) {
-                    if (x2-x1==y1-y2) {
-                        for (z=0; z<y1-y2-1; z++) {
+                if (x1<x2 && y1>y2) {                               //situation:    O
+                    if (x2-x1==y1-y2) {                             //             G
+                        for (z=0; z<y1-y2-1; z++) {                 //bishop on the down left of the king
                             if (tempBoard[x1+1+z][y1-1-z]==' '){
                                 count++;
                             }
@@ -769,9 +1005,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                         }
                     }
                 }
-                if (x1>x2 && y1>y2) {
-                    if (x1-x2==y1-y2) {
-                        for (z=0; z<y1-y2-1; z++) {
+                if (x1>x2 && y1>y2) {                               //situation:    G
+                    if (x1-x2==y1-y2) {                             //               O
+                        for (z=0; z<y1-y2-1; z++) {                 //bishop on the top left of the king
                             if (tempBoard[x1-1-z][y1-1-z]==' '){
                                 count++;
                             }
@@ -787,7 +1023,7 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
             }
         }
     }
-    //Queen check
+    //Queen check, copied from bishop and rook
     for (x = 0; x < 8; x++) {
         if (tempBoard[x][y1]=='H'){
             count=0;
@@ -919,7 +1155,10 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
             }
         }
     }
-    //King check
+    //King check, any of those
+//[O][O][O]
+//[O] K [O]
+//[O][O][O]
     for (x=0; x<8; x++) {
         for (y=0; y<8; y++) {
             if (tempBoard[x][y]=='K'){
@@ -955,17 +1194,26 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
     return 0;
 }
 
+//is started by blackMove function after "making test move"
+//check if player made a gg move, if it returns 0 the move was gg
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
+//x1 and y1 are used to remember where is the black king
+//x2 and y2 are used to remember where piece is
+//count is used to remember how big is free space between king and piece
 int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l){
     char tempBoard[8][8];
     int x, y, z, c, x1, y1, x2, y2, count;
-    for (x = 0; x < 8; x++) {
+    for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
         for (y = 0; y < 8; y++) {
             tempBoard[x][y]=board[x][y];
         }
     }
-    tempBoard[i][j]=' ';
-    tempBoard[k][l]=preMove;
-    for (x = 0; x < 8; x++) {
+    tempBoard[i][j]=' ';                        //cleaning the place before move
+    tempBoard[k][l]=preMove;                    //making the move
+    for (x = 0; x < 8; x++) {                   //looking for black king
         for (y = 0; y < 8; y++) {
             if (tempBoard[x][y]=='K'){
                 x1=x;
@@ -973,16 +1221,19 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
             }
         }
     }
-    //pawn check
+    //checking if pawn can kill king
     if (tempBoard[x1-1][y1-1]=='1' || tempBoard[x1-1][y1+1]=='1'){
         return 1;
     }
-    //rock check
+    //checking if rook can kill king
     for (x = 0; x < 8; x++) {
-        if (tempBoard[x][y1]=='5'){
+        if (tempBoard[x][y1]=='5'){                     //looking for rock
             count=0;
             x2=x;
             if (x1>x2){
+                //situation:    5
+                //              K
+                //rook is above the king
                 for (z=x2+1; z<x1; z++) {
                     if (tempBoard[z][y1]==' '){
                         count++;
@@ -996,6 +1247,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                 }
             }
             if (x1<x2){
+                //situation:    K
+                //              5
+                //rook is under the king
                 for (z=x1+1; z<x2; z++) {
                     if (tempBoard[z][y1]==' '){
                         count++;
@@ -1013,6 +1267,8 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
             count=0;
             y2=x;
             if (y1>y2){
+                //situation:    5K
+                //rook is on the left of the king
                 for (c=y2+1; c<y1; c++) {
                     if (tempBoard[x1][c]==' '){
                         count++;
@@ -1026,6 +1282,8 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                 }
             }
             if (y1<y2){
+                //situation:    K5
+                //rook is on the right of the king
                 for (c=y1+1; c<y2; c++) {
                     if (tempBoard[x1][c]==' '){
                         count++;
@@ -1040,7 +1298,15 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
             }
         }
     }
-    //knight check
+    //knight check, any of those:
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
+//[ ][ ][4][ ][4][ ][ ][ ]
+//[ ][4][ ][ ][ ][4][ ][ ]
+//[ ][ ][ ] K [ ][ ][ ][ ]
+//[ ][4][ ][ ][ ][4][ ][ ]
+//[ ][ ][4][ ][4][ ][ ][ ]
+//[ ][ ][ ][ ][ ][ ][ ][ ]
     if (tempBoard[x1+2][y1+1]=='4'){
         return 1;
     }
@@ -1068,11 +1334,14 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
     //bishop check
     for (x=0; x<8; x++) {
         for (y=0; y<8; y++) {
-            if (tempBoard[x][y]=='3'){
+            if (tempBoard[x][y]=='3'){                                  //looking for bishop
                 count=0;
                 x2=x;
                 y2=y;
                 if (x1>x2 && y1<y2) {
+                    //situation:    3
+                    //             K
+                    //bishop on the top right of the king
                     if (x1-x2==y2-y1) {
                         for (z=0; z<y2-y1-1; z++) {
                             if (tempBoard[x1-1-z][y1+1+z]==' '){
@@ -1088,6 +1357,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                     }
                 }
                 if (x1<x2 && y1<y2) {
+                    //situation:    K
+                    //               3
+                    //bishop on the down right of the king
                     if (x2-x1==y2-y1) {
                         for (z=0; z<y2-y1-1; z++) {
                             if (tempBoard[x1+1+z][y1+1+z]==' '){
@@ -1103,6 +1375,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                     }
                 }
                 if (x1<x2 && y1>y2) {
+                    //situation:    K
+                    //             3
+                    //bishop on the down left of the king
                     if (x2-x1==y1-y2) {
                         for (z=0; z<y1-y2-1; z++) {
                             if (tempBoard[x1+1+z][y1-1-z]==' '){
@@ -1118,6 +1393,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                     }
                 }
                 if (x1>x2 && y1>y2) {
+                    //situation:    3
+                    //               K
+                    //bishop on the top left of the king
                     if (x1-x2==y1-y2) {
                         for (z=0; z<y1-y2-1; z++) {
                             if (tempBoard[x1-1-z][y1-1-z]==' '){
@@ -1135,7 +1413,7 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
             }
         }
     }
-    //Queen check
+    //Queen check, copied from bishop and rook
     for (x = 0; x < 8; x++) {
         if (tempBoard[x][y1]=='9'){
             count=0;
@@ -1267,7 +1545,10 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
             }
         }
     }
-    //King check
+    //King check, any of those
+//[K][K][K]
+//[K] 0 [K]
+//[K][K][K]
     for (x=0; x<8; x++) {
         for (y=0; y<8; y++) {
             if (tempBoard[x][y]=='0'){
@@ -1303,86 +1584,132 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
     return 0;
 }
 
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
 void blackMove(char b[8][8]){
-    int i, j, k, l, afterMove;
+    int i, j, k, l, x, afterMove;
     char preMove;
     printf("Black move!\n");
     while (1) {
         printf("Type square from which u wanna make a move:");
         scanf("%d %d", &i, &j);
+        //check if player typed co-ordinates of black piece
         if (b[i][j] == 'P' || b[i][j] == 'W' || b[i][j] == 'S' || b[i][j] == 'G' || b[i][j] == 'H' || b[i][j] == 'P') {
             preMove = b[i][j];
             printf("Type square to which u wanna make a move:");
             scanf("%d %d", &k, &l);
+            //check if player typed co-ordinates of free space or of white piece
             if (b[k][l] == '1' || b[k][l] == '5' || b[k][l] == '4' || b[k][l] == '3' || b[k][l] == '9' || b[k][l]==' ') {
                 afterMove = b[k][l];
+                //check if player want to make correct move
+                //and check if there is no check on white after that move
                 if (blackCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnBlack(preMove, afterMove, i, j, k, l)==0) {
+                    //making the move
                     b[k][l] = preMove;
+                    //this short loop is used to switch black pawn by running blackPawnSwitch function
+                    for (x= 0; x<8; x++) {
+                        if (board[7][x] == 'P') {
+                            blackPawnSwitch(k, l);
+                        }
+                    }
                     break;
                 }
+                //if he didnt he have to start move loop again from the beginning
                 else {
                     printf("BAD MOVE!\n");
                 }
             }
+            //if he didnt he have to start move loop again from the beginning
             else {
                 printf("BAD MOVE!\n");
             }
         }
+        //if he didnt he have to start move loop again from the beginning
         else {
             printf("BAD MOVE!\n");
         }
     }
+    //disappear the old piece
     board[i][j]=' ';
+    //printing the board
     write(board);
 }
 
+//i, j are co-ordinates of piece before move (high, width)
+//k, l are co-ordinates of piece after move (high, width)
+//preMove tells what symbol was at (i,j)
+//afterMove tells what symbol was at (k,l)
 void whiteMove(char b[8][8]){
-    int i, j, k, l, preMove;
+    int i, j, k, l, x, preMove;
     char afterMove;
     printf("White move!\n");
     while (1) {
         printf("Type square from which u wanna make a move:");
         scanf("%d %d", &i, &j);
+        //check if player typed co-ordinates of white piece
         if (b[i][j]=='1' || b[i][j]=='5' || b[i][j]=='4' || b[i][j]=='3' || b[i][j]=='9' || b[i][j]=='0') {
             preMove = b[i][j];
             printf("Type square to which u wanna make a move:");
             scanf("%d %d", &k, &l);
+            //check if player typed co-ordinates of free space or of black piece
             if (b[k][l] == ' ' || b[k][l] == 'W' || b[k][l] == 'S' || b[k][l] == 'G' || b[k][l] == 'H' || b[k][l] == 'P'){
                 afterMove = b[k][l];
+                //check if player want to make correct move
+                //and check if there is no check on white after that move
                 if (whiteCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnWhite(preMove, afterMove, i, j, k, l)==0) {
+                    //making the move
                     b[k][l] = preMove;
+                    //this short loop is used to switch white pawn by running whitePawnSwitch function
+                    for (x= 0; x<8; x++) {
+                        if (board[0][x]=='1') {
+                            whitePawnSwitch(k, l);
+                        }
+                    }
                     break;
                 }
+                //if he didnt he have to start move loop again from the beginning
                 else {
                     printf("BAD MOVE!\n");
                 }
             }
+            //if he didnt he have to start move loop again from the beginning
             else {
                 printf("BAD MOVE!\n");
             }
         }
+        //if he didnt he have to start move loop again from the beginning
         else {
             printf("BAD MOVE!\n");
         }
     }
+    //disappear the old piece
     board[i][j]=' ';
+    //printing the board
     write(board);
 }
 
 int main() {
-    int type=0;
-    type=start();
-    if (type==1) {
-        clear(board);
-        write(board);
-        beforeMoves(board);
-        write(board);
-        while (1) {
-            whiteMove(board);
-            blackMove(board);
+    int type=0;                                             //setting game type for 0
+    type=start();                                           //choosing game type
+    if (type==1) {                                          //player vs player
+        clear(board);                                       //cleaning the board
+        write(board);                                       //printing the board
+        beforeMoves(board);                                 //setting pieces
+        write(board);                                       //printing the board
+        while (1) {                                         //if u dont see any gg move you have to surrender -> end program
+            castleCheckWhite(board);                        //check if white can do a castle in his move
+            whiteFlightBeatBeforeMove(board);               //check if black will have possibility to do flight kill on white after his move
+            whiteMove(board);                               //white move
+            whiteFlightBeat(board);                         //check if black can do flight kill on white after his move
+            castleCheckBlack(board);                        //check if black can do a castle in his move
+            blackFlightBeatBeforeMove(board);               //check if white will have possibility to do flight kill on black after his move
+            blackMove(board);                               //black move
+            blackFlightBeat(board);                         //check if white can do flight kill on black after his move
         }
     }
-    if (type==2){
+    if (type==2){                                           //player vs pc
         printf("not ready yet");
     }
     else return 0;
