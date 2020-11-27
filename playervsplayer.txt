@@ -1,6 +1,27 @@
 #include <stdio.h>
+#include <Windows.h>
+#include <fcntl.h>
 
 char board[8][8];                               //name says, its board xD
+
+//sets colours to all pieces
+enum kolorki{
+    niebieskiDeep = 1, //zamiast średników stosuje się przecinki
+    zielony = 2,
+    niebieskiLight = 3,
+    czerwony = 4,
+    fioletowy = 5,
+    zolty = 6,
+    szarawy = 7,
+    szary = 8,
+    niebieski = 9,
+    zielonyLight = 10,
+    niebieskiUltraLight = 11,
+    rozowy = 12,
+    fioletowyLight = 13,
+    kremowy = 14,
+    bialy = 15
+};
 
 //tells if we can do a castle
 int castleWhiteLeft=0;                          //if 0 maybe we can do long white castle
@@ -37,26 +58,49 @@ void clear(char b[8][8]){
 }
 
 //printing the board
-void write(char b[8][8]){
+void writee(char b[8][8]){
     int i, j;
-    printf("\n Plansza:\n");
-    printf("*************************************\n");
-    printf("*\\\\ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 //*\n");
-    printf("*\\\\-------------------------------//*\n");
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    printf("\n Board, (black on top):                                              Board, (white on top):\n");
+    printf("*************************************                               *************************************\n");
+    printf("*\\\\ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 //*                               *\\\\ 7 , 6 , 5 , 4 , 3 , 2 , 1 , 0 //*\n");
+    printf("*\\\\-------------------------------//*                               *\\\\-------------------------------//*\n");
     for (i = 0;  i<8 ; i++) {
         printf("*%d|", i);
         for (j = 0;  j<8 ; j++) {
+            if(board[i][j]=='P' || board[i][j]=='W' || board[i][j]=='S' || board[i][j]=='G' || board[i][j]=='H' || board[i][j]=='K') {
+                SetConsoleTextAttribute(hConsole, niebieski);
+            }
+            if(board[i][j]=='1' || board[i][j]=='5' || board[i][j]=='4' || board[i][j]=='3' || board[i][j]=='9' || board[i][j]=='0') {
+                SetConsoleTextAttribute(hConsole, zolty);
+            }
             printf(" %c ", b[i][j]);
+            SetConsoleTextAttribute(hConsole, bialy);
             if (j<7){
                 printf(",");
             }
         }
         printf("|%d*", i);
+        printf("                               *%d|", 7-i);
+        for (j = 0;  j<8 ; j++) {
+            if(board[7-i][7-j]=='P' || board[7-i][7-j]=='W' || board[7-i][7-j]=='S' || board[7-i][7-j]=='G' || board[7-i][7-j]=='H' || board[7-i][7-j]=='K') {
+                SetConsoleTextAttribute(hConsole, niebieski);
+            }
+            if(board[7-i][7-j]=='1' || board[7-i][7-j]=='5' || board[7-i][7-j]=='4' || board[7-i][7-j]=='3' || board[7-i][7-j]=='9' || board[7-i][7-j]=='0') {
+                SetConsoleTextAttribute(hConsole, zolty);
+            }
+            printf(" %c ", b[7-i][7-j]);
+            SetConsoleTextAttribute(hConsole, bialy);
+            if (j<7){
+                printf(",");
+            }
+        }
+        printf("|%d*", 7-i);
         printf("\n");
     }
-    printf("*//-------------------------------\\\\*\n");
-    printf("*// 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 \\\\*\n");
-    printf("*************************************\n");
+    printf("*//-------------------------------\\\\*                               *//-------------------------------\\\\*\n");
+    printf("*// 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 \\\\*                               *// 7 , 6 , 5 , 4 , 3 , 2 , 1 , 0 \\\\*\n");
+    printf("*************************************                               *************************************\n");
 }
 
 //setting pieces on the board
@@ -138,7 +182,7 @@ void castleCheckWhite(char b[8][8]){
 //if ure not sure how it work google it PLZ
 //castle conditions fucntion is runned by whiteCorrectMove function
 //if castleWhite returns 1 to whiteCorrectMove function castle is "ok"
-int castleWhite(l){                                          //every x, y, z, c are used in all kind of "for" X IS NOT WIDTH AND Y IS NOT HIGH
+int castleWhite(int l){                                          //every x, y, z, c are used in all kind of "for" X IS NOT WIDTH AND Y IS NOT HIGH
     if (castleWhiteKing!=0){                                 //if king ever made a move we cant do a castle
         return 0;
     }
@@ -500,7 +544,7 @@ void castleCheckBlack(char b[8][8]){
 //if ure not sure how it work google it PLZ
 //castle conditions fucntion is runned by blackCorrectMove function
 //if castleBlack returns 1 to blackCorrectMove function castle is "ok"
-int castleBlack(l){                                          //every x, y, z, c are used in all kind of "for" X IS NOT WIDTH AND Y IS NOT HIGH
+int castleBlack(int l){                                          //every x, y, z, c are used in all kind of "for" X IS NOT WIDTH AND Y IS NOT HIGH
     if (castleBlackKing!=0){                                 //if king ever made a move we cant do a castle
         return 0;
     }
@@ -1052,12 +1096,12 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
 //[3][ ][ ][ ][ ][ ][3][ ]
         if (i>k && j<l){
             for (temp=i-1, temp1=j+1; ; temp--, temp1++) {
-                    if (temp1==l && temp==k){
-                        return 1;
-                    }
-                    if (board[temp][temp1]!=' '){
-                        return 0;
-                    }
+                if (temp1==l && temp==k){
+                    return 1;
+                }
+                if (board[temp][temp1]!=' '){
+                    return 0;
+                }
             }
         }
         if (i<k && j<l){
@@ -2328,17 +2372,17 @@ void blackMove(char b[8][8]){
                     }
                     break;
                 }
-                //if he didnt he have to start move loop again from the beginning
+                    //if he didnt he have to start move loop again from the beginning
                 else {
                     printf("BAD MOVE!\n");
                 }
             }
-            //if he didnt he have to start move loop again from the beginning
+                //if he didnt he have to start move loop again from the beginning
             else {
                 printf("BAD MOVE!\n");
             }
         }
-        //if he didnt he have to start move loop again from the beginning
+            //if he didnt he have to start move loop again from the beginning
         else {
             printf("BAD MOVE!\n");
         }
@@ -2346,7 +2390,7 @@ void blackMove(char b[8][8]){
     //disappear the old piece
     board[i][j]=' ';
     //printing the board
-    write(board);
+    writee(board);
 }
 
 //i, j are co-ordinates of piece before move (high, width)
@@ -2381,17 +2425,17 @@ void whiteMove(char b[8][8]){
                     }
                     break;
                 }
-                //if he didnt he have to start move loop again from the beginning
+                    //if he didnt he have to start move loop again from the beginning
                 else {
                     printf("BAD MOVE!\n");
                 }
             }
-            //if he didnt he have to start move loop again from the beginning
+                //if he didnt he have to start move loop again from the beginning
             else {
                 printf("BAD MOVE!\n");
             }
         }
-        //if he didnt he have to start move loop again from the beginning
+            //if he didnt he have to start move loop again from the beginning
         else {
             printf("BAD MOVE!\n");
         }
@@ -2399,7 +2443,7 @@ void whiteMove(char b[8][8]){
     //disappear the old piece
     board[i][j]=' ';
     //printing the board
-    write(board);
+    writee(board);
 }
 
 int main() {
@@ -2407,9 +2451,9 @@ int main() {
     type=start();                                           //choosing game type
     if (type==1) {                                          //player vs player
         clear(board);                                       //cleaning the board
-        write(board);                                       //printing the board
+        writee(board);                                       //printing the board
         beforeMoves(board);                                 //setting pieces
-        write(board);                                       //printing the board
+        writee(board);                                       //printing the board
         while (1) {                                         //if u dont see any gg move you have to surrender -> end program
             castleCheckWhite(board);                        //check if white can do a castle in his move
             whiteFlightBeatBeforeMove(board);               //check if black will have possibility to do flight kill on white after his move
