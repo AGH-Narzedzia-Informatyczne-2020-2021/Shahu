@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <Windows.h>
-#include <fcntl.h>
+#define LOSE -1000
+#define WIN 1000
+#define A 4
+
 
 char board[8][8];                               //name says, its board xD
 
 //sets colours to all pieces
-enum kolorki{
+enum colours{
     niebieskiDeep = 1, //zamiast średników stosuje się przecinki
     zielony = 2,
     niebieskiLight = 3,
@@ -31,18 +34,51 @@ int castleBlackLeft=0;                          //if 0 maybe we can do long blac
 int castleBlackRight=0;                         //if 0 maybe we can do short black castle
 int castleBlackKing=0;                          //if 0 we can do black castle
 
+//for minimax algorithm
+int castleWhiteLeftV1=0;                          //if 0 maybe we can do long white castle
+int castleWhiteRightV1=0;                         //if 0 maybe we can do short white castle
+int castleWhiteKingV1=0;                          //if 0 we can do white castle
+int castleBlackLeftV1=0;                          //if 0 maybe we can do long black castle
+int castleBlackRightV1=0;                         //if 0 maybe we can do short black castle
+int castleBlackKingV1=0;                          //if 0 we can do black castle
+
 //tells if we can do a flight kill
 int whiteFlight[8]={1,1,1,1,1,1,1,1};           //only if certain whiteFlight=1 we can kill white in flight on that width
 char blackFlight[8]="PPPPPPPP";                 //only if certain blackFlight=P we can kill black in flight on that width
 
 //here u choose which type of game u wanna play
-int start(){
-    int type;
-    printf("Hey, nice to see you!\nDo you wanna play chess against my Pc algorithm?\n-->If no, and you wanna play against player type: (1)\n-->If yes type: (2)\n-->");
-    while (1) {
-        scanf("%d", &type);
-        if (type == 1 || type == 2) {
-            return type;
+int start(int type){
+    if(type==0) {
+        printf("Hey, nice to see you!\n"
+               "Do you wanna play chess against my Pc algorithm?\n"
+               "-->If no, and you wanna play against player type: (1)\n"
+               "-->If yes type: (2)\n"
+               "-->");
+        while (1) {
+            scanf("%d", &type);
+            if (type == 1 || type == 2) {
+                return type;
+            }
+            else{
+                printf("BAD TYPE! Choose once again!\n"
+                       "-->");
+            }
+        }
+    }
+    if (type==2){
+        printf("Which colour u wanna play?\n"
+               "-->If white type: (1)\n"
+               "-->If black type: (2)\n"
+               "-->");
+        while (1) {
+            scanf("%d", &type);
+            if (type == 1 || type == 2) {
+                return type;
+            }
+            else{
+                printf("BAD TYPE! Choose once again!\n"
+                       "-->");
+            }
         }
     }
 }
@@ -57,50 +93,211 @@ void clear(char b[8][8]){
     }
 }
 
+//rating the board
+int bs=0, bl=0, ws=0, wl=0;
+int countBlack=0, countWhite=0;
+int rating(char b[8][8]){
+    int heuristics[8][8]={{100,100,100,100,100,100,100,100},
+                          {100,120,120,120,120,120,120,100},
+                          {100,120,140,140,140,140,120,100},
+                          {100,120,140,160,160,140,120,100},
+                          {100,120,140,160,160,140,120,100},
+                          {100,120,140,140,140,140,120,100},
+                          {100,120,120,120,120,120,120,100},
+                          {100,100,100,100,100,100,100,100},};
+    int BlackKing=0, WhiteKing=0;
+    int sum=0;
+    int i, j;
+    for(i=0; i<8; ++i){
+        for(j=0; j<8; ++j){
+            if(b[i][j]=='K'){
+                BlackKing=1;
+                break;
+            }
+        }
+    }
+    for(i=0; i<8; ++i){
+        for(j=0; j<8; ++j){
+            if(b[i][j]=='0'){
+                WhiteKing=1;
+                break;
+            }
+        }
+    }
+    if(BlackKing==0){
+        return LOSE*3;
+    }
+    if(WhiteKing==0){
+        return WIN*3;
+    }
+    for(i=0; i <8; ++i){
+        for(j=0; j <8; ++j){
+            if(b[i][j]=='1') sum-=1*heuristics[i][j];
+            if(b[i][j]=='P') sum+=1*heuristics[i][j];
+            if(b[i][j]=='4') sum-=3*heuristics[i][j];
+            if(b[i][j]=='S') sum+=3*heuristics[i][j];
+            if(b[i][j]=='3') sum-=3*heuristics[i][j];
+            if(b[i][j]=='G') sum+=3*heuristics[i][j];
+            if(b[i][j]=='5') sum-=5*heuristics[i][j];
+            if(b[i][j]=='W') sum+=5*heuristics[i][j];
+            if(b[i][j]=='9') sum-=9*heuristics[i][j];
+            if(b[i][j]=='H') sum+=9*heuristics[i][j];
+        }
+    }
+    //king with no move + rook with no move
+    if (b[0][4]=='K'){
+        sum+=20;
+    }
+    if (b[7][4]=='0'){
+        sum-=20;
+    }
+    if (castleBlackRight==0 && castleBlackKing==0){
+        sum+=20;
+    }
+    if (castleBlackLeft==0 && castleBlackKing==0){
+        sum+=20;
+    }
+    if (castleWhiteRight==0 && castleWhiteKing==0){
+        sum-=20;
+    }
+    if (castleWhiteLeft==0 && castleWhiteKing==0){
+        sum-=20;
+    }
+    //castled
+    if (countBlack==0) {
+        if (b[0][6] == 'K' && b[0][5] == 'W') {
+            bs=+120;
+            countBlack++;
+        }
+        if (b[0][2] == 'K' && b[0][3] == 'W') {
+            bl=+100;
+            countBlack++;
+        }
+    }
+    if (countWhite==0) {
+        if (b[7][6] == '0' && b[7][5] == '5') {
+            ws=-120;
+            countWhite++;
+        }
+        if (b[7][2] == '0' && b[7][3] == '5') {
+            wl=-100;
+            countWhite++;
+        }
+    }
+    return sum+bs+bl+ws+wl;
+}
+
+//for minimax algorithm
+//rating the board
+int ratingV1(char b[8][8]){
+    int heuristics[8][8]={{100,100,100,100,100,100,100,100},
+                          {100,120,120,120,120,120,120,100},
+                          {100,120,140,140,140,140,120,100},
+                          {100,120,140,160,160,140,120,100},
+                          {100,120,140,160,160,140,120,100},
+                          {100,120,140,140,140,140,120,100},
+                          {100,120,120,120,120,120,120,100},
+                          {100,100,100,100,100,100,100,100},};
+    int BlackKing=0, WhiteKing=0;
+    int sum=0;
+    int i, j;
+    for(i=0; i<8; ++i){
+        for(j=0; j<8; ++j){
+            if(b[i][j]=='K'){
+                BlackKing=1;
+                break;
+            }
+        }
+    }
+    for(i=0; i<8; ++i){
+        for(j=0; j<8; ++j){
+            if(b[i][j]=='0'){
+                WhiteKing=1;
+                break;
+            }
+        }
+    }
+    if(BlackKing==0){
+        return LOSE*3;
+    }
+    if(WhiteKing==0){
+        return WIN*3;
+    }
+    for(i=0; i <8; ++i){
+        for(j=0; j <8; ++j){
+            if(b[i][j]=='1') sum-=1*heuristics[i][j];
+            if(b[i][j]=='P') sum+=1*heuristics[i][j];
+            if(b[i][j]=='4') sum-=3*heuristics[i][j];
+            if(b[i][j]=='S') sum+=3*heuristics[i][j];
+            if(b[i][j]=='3') sum-=3*heuristics[i][j];
+            if(b[i][j]=='G') sum+=3*heuristics[i][j];
+            if(b[i][j]=='5') sum-=5*heuristics[i][j];
+            if(b[i][j]=='W') sum+=5*heuristics[i][j];
+            if(b[i][j]=='9') sum-=9*heuristics[i][j];
+            if(b[i][j]=='H') sum+=9*heuristics[i][j];
+        }
+    }
+    return sum;
+}
+
 //printing the board
-void writee(char b[8][8]){
+void writee(char b[8][8]) {
     int i, j;
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    printf("\n Board, (black on top):                                              Board, (white on top):\n");
-    printf("*************************************                               *************************************\n");
-    printf("*\\\\ 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 //*                               *\\\\ 7 , 6 , 5 , 4 , 3 , 2 , 1 , 0 //*\n");
-    printf("*\\\\-------------------------------//*                               *\\\\-------------------------------//*\n");
-    for (i = 0;  i<8 ; i++) {
+    printf("\n Board, (black on top):                                            Board, (white on top):\n");
+    printf("*****************************************************             *****************************************************\n");
+    printf("*\\\\  0  *  1  *  2  *  3  *  4  *  5  *  6  *  7  //*             *\\\\  7  *  6  *  5  *  4  *  3  *  2  *  1  *  0  //*");
+    printf("\n* +-----+-----+-----+-----+-----+-----+-----+-----+ *             * +-----+-----+-----+-----+-----+-----+-----+-----+ *\n");
+    //printf("*\\\\-----------------------------------------------//*         *\\\\-----------------------------------------------//*\n");
+    for (i = 0; i < 8; i++) {
         printf("*%d|", i);
-        for (j = 0;  j<8 ; j++) {
-            if(board[i][j]=='P' || board[i][j]=='W' || board[i][j]=='S' || board[i][j]=='G' || board[i][j]=='H' || board[i][j]=='K') {
+        for (j = 0; j < 8; j++) {
+            if (board[i][j] == 'P' || board[i][j] == 'W' || board[i][j] == 'S' || board[i][j] == 'G' ||
+                board[i][j] == 'H' || board[i][j] == 'K') {
                 SetConsoleTextAttribute(hConsole, niebieski);
             }
-            if(board[i][j]=='1' || board[i][j]=='5' || board[i][j]=='4' || board[i][j]=='3' || board[i][j]=='9' || board[i][j]=='0') {
+            if (board[i][j] == '1' || board[i][j] == '5' || board[i][j] == '4' || board[i][j] == '3' ||
+                board[i][j] == '9' || board[i][j] == '0') {
                 SetConsoleTextAttribute(hConsole, zolty);
             }
-            printf(" %c ", b[i][j]);
+            printf("  %c  ", b[i][j]);
             SetConsoleTextAttribute(hConsole, bialy);
-            if (j<7){
-                printf(",");
+            if (j < 7) {
+                printf("|");
             }
         }
         printf("|%d*", i);
-        printf("                               *%d|", 7-i);
-        for (j = 0;  j<8 ; j++) {
-            if(board[7-i][7-j]=='P' || board[7-i][7-j]=='W' || board[7-i][7-j]=='S' || board[7-i][7-j]=='G' || board[7-i][7-j]=='H' || board[7-i][7-j]=='K') {
+        printf("             *%d|", 7 - i);
+        for (j = 0; j < 8; j++) {
+            if (board[7 - i][7 - j] == 'P' || board[7 - i][7 - j] == 'W' || board[7 - i][7 - j] == 'S' ||
+                board[7 - i][7 - j] == 'G' || board[7 - i][7 - j] == 'H' || board[7 - i][7 - j] == 'K') {
                 SetConsoleTextAttribute(hConsole, niebieski);
             }
-            if(board[7-i][7-j]=='1' || board[7-i][7-j]=='5' || board[7-i][7-j]=='4' || board[7-i][7-j]=='3' || board[7-i][7-j]=='9' || board[7-i][7-j]=='0') {
+            if (board[7 - i][7 - j] == '1' || board[7 - i][7 - j] == '5' || board[7 - i][7 - j] == '4' ||
+                board[7 - i][7 - j] == '3' || board[7 - i][7 - j] == '9' || board[7 - i][7 - j] == '0') {
                 SetConsoleTextAttribute(hConsole, zolty);
             }
-            printf(" %c ", b[7-i][7-j]);
+            printf("  %c  ", b[7 - i][7 - j]);
             SetConsoleTextAttribute(hConsole, bialy);
-            if (j<7){
-                printf(",");
+            if (j < 7) {
+                printf("|");
             }
         }
-        printf("|%d*", 7-i);
+        printf("|%d*", 7 - i);
+        printf("\n* +-----+-----+-----+-----+-----+-----+-----+-----+ *             * +-----+-----+-----+-----+-----+-----+-----+-----+ *");
         printf("\n");
     }
-    printf("*//-------------------------------\\\\*                               *//-------------------------------\\\\*\n");
-    printf("*// 0 , 1 , 2 , 3 , 4 , 5 , 6 , 7 \\\\*                               *// 7 , 6 , 5 , 4 , 3 , 2 , 1 , 0 \\\\*\n");
-    printf("*************************************                               *************************************\n");
+    //printf("*//-----------------------------------------------\\\\*             *//-----------------------------------------------\\\\*\n");
+    printf("*//  0  *  1  *  2  *  3  *  4  *  5  *  6  *  7  \\\\*             *//  7  *  6  *  5  *  4  *  3  *  2  *  1  *  0  \\\\*\n");
+    printf("*****************************************************             *****************************************************");
+    if (rating(board) > 0) {
+        printf("\n                                                                                                          Rating: %d\n",
+               -rating(board));
+    }
+    else{
+        printf("\n                                                                                                          Rating: %d\n",
+               -rating(board));
+    }
 }
 
 //setting pieces on the board
@@ -516,10 +713,10 @@ int castleWhite(int l){                                          //every x, y, z
                 }
                 if (board[7][3]=='K'){
                     return 0;
-                }                                                                       //if any of above didnt happen we do castle
-                board[7][5]='5';                                                        //moove the rook
-                board[7][7]=' ';                                                        //clean the board
-                return 1;                                                               //we return 1 to whiteCorrectMove because castle is possible
+                }//if any of above didnt happen we do castle
+                board[7][5] = '5';                                                        //moove the rook
+                board[7][7] = ' ';                                                        //clean the board
+                return 1;                                                                 //we return 1 to whiteCorrectMove because castle is possible
             }
             return 0;
         }
@@ -707,8 +904,8 @@ int castleBlack(int l){                                          //every x, y, z
                 if (board[0][5]=='0'){
                     return 0;
                 }                                                                       //if any of above didnt happen we do castle
-                board[0][3]='W';                                                        //moove the rook
-                board[0][0]=' ';                                                        //clean the board
+                /*board[0][3]='W';                                                        //moove the rook
+                board[0][0]=' ';                                                        //clean the board*/
                 return 1;                                                               //we return 1 to whiteCorrectMove because castle is possible
             }
             return 0;
@@ -875,12 +1072,9 @@ int castleBlack(int l){                                          //every x, y, z
                     if (board[1][x]=='0'){
                         return 0;
                     }
-                }
-                if (board[0][3]=='K'){
-                    return 0;
                 }                                                                       //if any of above didnt happen we do castle
-                board[7][5]='5';                                                        //moove the rook
-                board[7][7]=' ';                                                        //clean the board
+                /*board[0][5]='W';                                                        //moove the rook
+                board[0][7]=' ';                                                        //clean the board*/
                 return 1;                                                               //we return 1 to blackCorrectMove because castle is possible
             }
             return 0;
@@ -958,6 +1152,7 @@ void blackFlightBeat(char b[8][8]){//we are checking if we can kill black in fli
 //k, l are co-ordinates of piece after move (high, width)
 //preMove tells what symbol was at (i,j)
 //afterMove tells what symbol was at (k,l)
+int xd=0;
 int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
     int temp, temp1;
     if (preMove=='1'){//pawn moves, 1 forward, kill slant
@@ -1260,7 +1455,7 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
         if (i-1==k && j+1==l){
             return 1;
         }
-        if (i==k && j-2==l || i==k && j+2==l){          //castle
+        if (i==k && j-2==l && xd==0 || i==k && j+2==l && xd==0){          //castle
             return castleWhite(l);
         }
     }
@@ -1273,11 +1468,12 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
 //k, l are co-ordinates of piece after move (high, width)
 //preMove tells what symbol was at (i,j)
 //afterMove tells what symbol was at (k,l)
+int xdd=0;
 int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
     int temp, temp1;
     if (preMove=='P'){//pawn moves, 1 forward, kill slant
         if (i==1){
-            if (k==i+2 && l==j && afterMove==' ' || k==i+1 && j==l && afterMove==' '){
+            if (k==i+2 && l==j && afterMove==' ' && board[5][j]==' ' || k==i+1 && j==l && afterMove==' '){
                 return 1;
             }
         }
@@ -1575,7 +1771,7 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
         if (i-1==k && j+1==l){
             return 1;
         }
-        if (i==k && j-2==l || i==k && j+2==l){          //castle
+        if (i==k && j-2==l & xdd==0|| i==k && j+2==l & xdd==0){          //castle
             return castleBlack(l);
         }
     }
@@ -1725,9 +1921,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -1740,9 +1936,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -1755,9 +1951,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -1770,9 +1966,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -1857,9 +2053,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -1872,9 +2068,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -1887,9 +2083,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -1902,9 +2098,9 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -1978,7 +2174,7 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
         }
     }
     //checking if pawn can kill king
-    if (tempBoard[x1-1][y1-1]=='1' || tempBoard[x1-1][y1+1]=='1'){
+    if (tempBoard[x1+1][y1+1]=='1' || tempBoard[x1+1][y1-1]=='1'){
         return 1;
     }
     //checking if rook can kill king
@@ -2106,9 +2302,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -2124,9 +2320,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -2142,9 +2338,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -2160,9 +2356,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -2247,9 +2443,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -2262,9 +2458,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y2-y1-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y1+1==y2){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y1+1==y2){
+                            return 1;
                         }
                     }
                 }
@@ -2277,9 +2473,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x1+1==x2 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x1+1==x2 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -2292,9 +2488,9 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
                             if (count==y1-y2-1){
                                 return 1;
                             }
-                            if (x2+1==x1 && y2+1==y1){
-                                return 1;
-                            }
+                        }
+                        if (x2+1==x1 && y2+1==y1){
+                            return 1;
                         }
                     }
                 }
@@ -2347,6 +2543,7 @@ int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l
 void blackMove(char b[8][8]){
     int i, j, k, l, x, afterMove;
     char preMove;
+    xdd=0;
     printf("Black move!\n");
     while (1) {
         printf("Type square from which u wanna make a move:");
@@ -2389,8 +2586,11 @@ void blackMove(char b[8][8]){
     }
     //disappear the old piece
     board[i][j]=' ';
+    //check if black can do a castle in his move
+    castleCheckBlack(board);
     //printing the board
     writee(board);
+    xdd++;
 }
 
 //i, j are co-ordinates of piece before move (high, width)
@@ -2400,6 +2600,7 @@ void blackMove(char b[8][8]){
 void whiteMove(char b[8][8]){
     int i, j, k, l, x, preMove;
     char afterMove;
+    xd=0;
     printf("White move!\n");
     while (1) {
         printf("Type square from which u wanna make a move:");
@@ -2442,31 +2643,179 @@ void whiteMove(char b[8][8]){
     }
     //disappear the old piece
     board[i][j]=' ';
+    //check if white can do a castle in his next move
+    castleCheckWhite(board);
     //printing the board
     writee(board);
+    xd++;
+}
+
+int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int turn, int alfa, int beta) {
+    int result = ratingV1(b), maxResult, minResult, i, j, k, l, afterMoveBlack, preMoveWhite, x, y;
+    int ptmp, qtmp, rtmp, stmp;
+    char preMoveBlack, afterMoveWhite, before;
+    if (deep<=0 || result>=WIN || result<=LOSE) {
+        return result;
+    }
+    if (turn) {
+        for (i=0, maxResult = 200*LOSE; i<8; i++) {
+            for (j = 0; j < 8; j++) {
+                if (b[i][j] == 'P' || b[i][j] == 'W' || b[i][j] == 'S' || b[i][j] == 'G' || b[i][j] == 'H' ||
+                    b[i][j] == 'K') {
+                    preMoveBlack = b[i][j];
+                    for (k = 0; k < 8; k++) {
+                        for (l = 0; l < 8; l++) {
+                            if (b[k][l] == '1' || b[k][l] == '5' || b[k][l] == '4' || b[k][l] == '3' ||
+                                b[k][l] == '9' || b[k][l] == ' ') {
+                                afterMoveBlack = b[k][l];
+                                if (blackCorrectMoves(preMoveBlack, afterMoveBlack, i, j, k, l) == 1 &&
+                                    checkTheCheckOnBlack(preMoveBlack, afterMoveBlack, i, j, k, l) == 0) {
+                                    b[k][l] = preMoveBlack;
+                                    b[i][j] = ' ';
+                                    //castleCheckBlackV1(btemp);              //check if black can do a castle in his move
+                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn, alfa, beta);
+                                    b[i][j] = preMoveBlack;
+                                    b[k][l] = afterMoveBlack;
+                                    if (result>maxResult) {
+                                        maxResult = result;
+                                        *p = i;
+                                        *q = j;
+                                        *r = k;
+                                        *s = l;
+                                    }
+                                    if(maxResult>alfa){
+                                        alfa=maxResult;
+                                    }
+                                    if(beta<=alfa){
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return maxResult;
+    }
+    else {
+        for (i = 0, minResult = 200 * WIN; i < 8; i++) {
+            for (j = 0; j < 8; j++) {
+                if (b[i][j] == '1' || b[i][j] == '5' || b[i][j] == '4' || b[i][j] == '3' || b[i][j] == '9' ||
+                    b[i][j] == '0') {
+                    preMoveWhite = b[i][j];
+                    for (k = 0; k < 8; k++) {
+                        for (l = 0; l < 8; l++) {
+                            if (b[k][l] == ' ' || b[k][l] == 'W' || b[k][l] == 'S' || b[k][l] == 'G' ||
+                                b[k][l] == 'H' || b[k][l] == 'P') {
+                                afterMoveWhite = b[k][l];
+                                if (whiteCorrectMoves(preMoveWhite, afterMoveWhite, i, j, k, l) == 1 &&
+                                    checkTheCheckOnWhite(preMoveWhite, afterMoveWhite, i, j, k, l) == 0) {
+                                    b[k][l] = preMoveWhite;
+                                    b[i][j] = ' ';
+                                    //castleCheckWhiteV1(btemp);             //check if white can do a castle in his next move
+                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn, alfa, beta);
+                                    b[i][j] = preMoveWhite;
+                                    b[k][l] = afterMoveWhite;
+                                    if (result < minResult) {
+                                        minResult = result;
+                                        *p = i;
+                                        *q = j;
+                                        *r = k;
+                                        *s = l;
+                                    }
+                                    if(minResult<beta){
+                                        beta=minResult;
+                                    }
+                                    if(beta<=alfa){
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return minResult;
+    }
 }
 
 int main() {
+    int x;
+    setbuf(stdout, 0);                               //CLion bug
     int type=0;                                             //setting game type for 0
-    type=start();                                           //choosing game type
+    type=start(type);                                       //choosing game type
     if (type==1) {                                          //player vs player
         clear(board);                                       //cleaning the board
-        writee(board);                                       //printing the board
+        writee(board);                                      //printing the board
         beforeMoves(board);                                 //setting pieces
-        writee(board);                                       //printing the board
+        writee(board);                                      //printing the board
         while (1) {                                         //if u dont see any gg move you have to surrender -> end program
-            castleCheckWhite(board);                        //check if white can do a castle in his move
             whiteFlightBeatBeforeMove(board);               //check if black will have possibility to do flight kill on white after his move
             whiteMove(board);                               //white move
             whiteFlightBeat(board);                         //check if black can do flight kill on white after his move
-            castleCheckBlack(board);                        //check if black can do a castle in his move
             blackFlightBeatBeforeMove(board);               //check if white will have possibility to do flight kill on black after his move
             blackMove(board);                               //black move
             blackFlightBeat(board);                         //check if white can do flight kill on black after his move
         }
     }
-    if (type==2){                                           //player vs pc
-        printf("not ready yet");
+    if (type==2){                                               //player vs pc
+        int p, q, r, s;                                         //those remembers i, ,j, k, l of PC
+        char before;                                            //it is used just to make a move
+        type=start(type);                                       //choosing game type
+        if (type==1) {                                          //you gonna play white
+            clear(board);                                       //cleaning the board
+            writee(board);                                      //printing the board
+            beforeMoves(board);                                 //setting pieces
+            writee(board);                                      //printing the board
+            while (1) {                                         //if u dont see any gg move you have to surrender -> end program
+                whiteFlightBeatBeforeMove(board);               //check if black will have possibility to do flight kill on white after his move
+                whiteMove(board);                               //white move
+                whiteFlightBeat(board);                         //check if black can do flight kill on white after his move
+                castleCheckBlack(board);                        //check if black can do a castle in his move
+                blackFlightBeatBeforeMove(board);               //check if white will have possibility to do flight kill on black after his move
+                minimaxBlack(board, &p, &q, &r, &s, A, 1, 1000*LOSE, 1000*WIN);   //black move
+                printf("PC: (%d,%d)-->(%d,%d)\n", p, q, r, s);
+                before=board[p][q];
+                board[p][q]=' ';
+                board[r][s]=before;
+                if (p==0 && q==4 && r==0 && s==6){
+                    board[0][5]='W';                                                        //moove the rook
+                    board[0][7]=' ';                                                        //clean the board
+                }
+                if (p==0 && q==4 && r==0 && s==2) {
+                    board[0][3] = 'W';                                                        //moove the rook
+                    board[0][0] = ' ';                                                        //clean the board
+                }
+                for (x = 0; x < 8; x++) {
+                    if (board[7][x] == 'P') {
+                        blackPawnSwitch(r, s);
+                    }
+                }
+                castleCheckWhite(board);                        //check if white can do a castle in his next move
+                castleCheckBlack(board);                        //check if black can do a castle in his next move
+                writee(board);                                  //writing the board
+                blackFlightBeat(board);                         //check if white can do flight kill on black after his move
+            }
+        }
+        if (type==2){                                           //you gonna play black
+            printf("not ready yet!!!");
+            clear(board);                                       //cleaning the board
+            writee(board);                                      //printing the board
+            beforeMoves(board);                                 //setting pieces
+            writee(board);                                      //printing the board
+            while (1) {                                         //if u dont see any gg move you have to surrender -> end program
+                castleCheckWhite(board);                        //check if white can do a castle in his move
+                whiteFlightBeatBeforeMove(board);               //check if black will have possibility to do flight kill on white after his move
+                //whiteMove(board);                               //white move
+                whiteFlightBeat(board);                         //check if black can do flight kill on white after his move
+                castleCheckBlack(board);                        //check if black can do a castle in his move
+                blackFlightBeatBeforeMove(board);               //check if white will have possibility to do flight kill on black after his move
+                blackMove(board);                               //black move
+                blackFlightBeat(board);                         //check if white can do flight kill on black after his move
+            }
+        }
     }
     else return 0;
 }
