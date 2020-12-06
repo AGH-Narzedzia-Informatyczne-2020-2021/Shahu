@@ -16,11 +16,10 @@ namespace shahu{
         ALLEGRO_BITMAP *button1;
         ALLEGRO_BITMAP *button2;
         ALLEGRO_BITMAP *button3;
+        float x[3]={200,200,200};
+        float y[3]={200,400,600};
     };
 }
-//komentarz
-//komentarz
-//komentarz
-//komentzra
+
 
 #endif //SHAHU_MAINMENU_H
