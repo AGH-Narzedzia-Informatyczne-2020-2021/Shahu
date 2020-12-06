@@ -1,12 +1,14 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
+
 #include <iostream>
 
 #include "shahu.h"
 
 int main()
 {
-feat/mainMenu
+
     shahu::HelloWorld::printHello();
     //konflikt
     //KONFLIKT
@@ -21,7 +23,6 @@ feat/mainMenu
     std::cout << "      Piotr Pyrczak." << std::endl;
     std::cout << "                                               All rights reserved." << std::endl;
 
-dev
 
     //---------------INITIALIZATION------------
     if(!al_init())
@@ -29,10 +30,21 @@ dev
         std::cout << "couldn't initialize allegro" << std::endl;
         return 1;
     }
+    if(!al_init_image_addon())
+    {
+        std::cout << "couldn't initialize image addon" << std::endl;
+        return 1;
+    }
 
     if(!al_install_keyboard())
     {
         std::cout << "couldn't initialize keyboard\n" << std::endl;
+        return 1;
+    }
+
+    if(!al_install_mouse())
+    {
+        std::cout << "couldn't initialize mouse\n" << std::endl;
         return 1;
     }
 
@@ -65,6 +77,7 @@ dev
     }
 
     al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_mouse_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
     al_register_event_source(queue, al_get_timer_event_source(timer));
     //-------------------------
