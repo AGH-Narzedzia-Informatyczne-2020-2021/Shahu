@@ -16,8 +16,8 @@ namespace shahu{
         ALLEGRO_BITMAP *button1;
         ALLEGRO_BITMAP *button2;
         ALLEGRO_BITMAP *button3;
-        float x[3]={200,200,200};
-        float y[3]={200,400,600};
+        float x[3]={490,0,490};
+        float y[3]={300,575,500};
     };
 }
 
