@@ -19,7 +19,7 @@ bool MainMenu::load()
 
 bool MainMenu::render() {
     al_draw_bitmap(tlo,0,0,0);
-    al_draw_bitmap(title,0,0,0);
+    al_draw_bitmap(title,140,0,0);
     al_draw_bitmap(button1,x[0],y[0],0);
     al_draw_bitmap(button2,x[1],y[1],0);
     al_draw_bitmap(button3,x[2],y[2],0);
