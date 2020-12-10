@@ -91,8 +91,7 @@ int main()
     ALLEGRO_EVENT event;
     shahu::MainMenu menu;
     menu.load();
-    al_set_system_mouse_cursor(disp, ALLEGRO_SYSTEM_MOUSE_CURSOR_LINK);
-    int a,b;
+    float a,b;
 
     //-------------MAIN LOOP--------------
     al_start_timer(timer);
@@ -121,10 +120,9 @@ int main()
             al_clear_to_color(al_map_rgb(0, 0, 0));
             menu.render();
             if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-                a = event.mouse.x;
-                b = event.mouse.y;
-                al_set_mouse_xy(disp, a, b);
-                menu.click(a,b,&menu.button1, &menu.button2, &menu.button3 );
+                a = (float)event.mouse.x;
+                b = (float)event.mouse.y;
+                menu.click(a,b);
                 menu.render();
             }
             al_flip_display();
