@@ -12,7 +12,6 @@ bool MainMenu::load()
     button1 = al_load_bitmap("../assets/menu/Przycisk_graj.png");
     button2 = al_load_bitmap("../assets/menu/ustawienia.png");
     button3 = al_load_bitmap("../assets/menu/wyjdz.png");
-    //Tak jak Pan Jezus powiedzial
 
     return true;
 }
@@ -27,18 +26,16 @@ bool MainMenu::render() {
     return true;
 }
 
-void MainMenu::click(int a, int b, ALLEGRO_BITMAP **b1, ALLEGRO_BITMAP **b2, ALLEGRO_BITMAP **b3){
-    if((x[0]<=a<=x[0]+300)&&y[0]<=b<=y[0]+150){
-        *b1 = al_load_bitmap("../assets/menu/Przycisk_graj_wcisniety.png");
-        //render();
+void MainMenu::click(float a, float b){
+    if((x[0]<=a&&a<=x[0]+300)&&(y[0]<=b&&b<=y[0]+150)){
+        button1 = al_load_bitmap("../assets/menu/Przycisk_graj_wcisniety.png");
+
     }
-    if((x[1]<=a&&a<=x[1]+130)&&y[1]<=b&&b<=y[1]+145){
-        *b2 = al_load_bitmap("../assets/menu/ustawienia_wcisniete.png");
-        //render();
+    if((x[1]<=a&&a<=x[1]+130)&&(y[1]<=b&&b<=y[1]+145)){
+        button2 = al_load_bitmap("../assets/menu/ustawienia_wcisniete.png");
     }
     if(x[2]<=a&&a<=x[2]+300&&y[2]<=b&&b<=y[2]+150){
-        *b3 = al_load_bitmap("../assets/menu/wyjdz_wcisniety.png");
-        //render();
+        button3 = al_load_bitmap("../assets/menu/wyjdz_wcisniety.png");
     }
 
 }
