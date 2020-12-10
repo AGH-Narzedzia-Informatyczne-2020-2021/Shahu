@@ -10,7 +10,7 @@ namespace shahu{
     public:
         bool render();
         bool load();
-        void click(int a, int b, ALLEGRO_BITMAP **b1, ALLEGRO_BITMAP **b2, ALLEGRO_BITMAP **b3);
+        void click(float a, float b);
     //private:
         ALLEGRO_BITMAP *tlo;
         ALLEGRO_BITMAP *title;
