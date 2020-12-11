@@ -106,6 +106,11 @@ int main()
                 break;
 
             case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                a = (float)event.mouse.x;
+                b = (float)event.mouse.y;
+                exit = menu.click(a,b);
+                break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 exit = true;
                 break;
@@ -119,12 +124,6 @@ int main()
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
             menu.render();
-            if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-                a = (float)event.mouse.x;
-                b = (float)event.mouse.y;
-                menu.click(a,b);
-                menu.render();
-            }
             al_flip_display();
 
             redraw = false;
