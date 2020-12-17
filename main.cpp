@@ -1,8 +1,11 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
+#include <allegro5/allegro_image.h>
+
 #include <iostream>
 
 #include "shahu.h"
+#include "./src/views/MainMenu.h"
 
 int main()
 {
@@ -25,9 +28,21 @@ int main()
         return 1;
     }
 
+    if(!al_init_image_addon())
+    {
+        std::cout << "couldn't initialize image addon" << std::endl;
+        return 1;
+    }
+
     if(!al_install_keyboard())
     {
         std::cout << "couldn't initialize keyboard\n" << std::endl;
+        return 1;
+    }
+
+    if(!al_install_mouse())
+    {
+        std::cout << "couldn't initialize mouse\n" << std::endl;
         return 1;
     }
 
@@ -60,6 +75,7 @@ int main()
     }
 
     al_register_event_source(queue, al_get_keyboard_event_source());
+    al_register_event_source(queue, al_get_mouse_event_source());
     al_register_event_source(queue, al_get_display_event_source(disp));
     al_register_event_source(queue, al_get_timer_event_source(timer));
     //-------------------------
@@ -70,6 +86,9 @@ int main()
     bool exit = false;
     bool redraw = true;
     ALLEGRO_EVENT event;
+    shahu::MainMenu menu;
+    menu.load();
+    float a,b;
 
     //-------------MAIN LOOP--------------
     al_start_timer(timer);
@@ -84,6 +103,11 @@ int main()
                 break;
 
             case ALLEGRO_EVENT_KEY_DOWN:
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                a = (float)event.mouse.x;
+                b = (float)event.mouse.y;
+                exit = menu.click(a,b);
+                break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 exit = true;
                 break;
@@ -96,7 +120,7 @@ int main()
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(0, 0, 0));
-            al_draw_text(font, al_map_rgb(255, 255, 255), 0, 0, 0, "Hello world!");
+            menu.render();
             al_flip_display();
 
             redraw = false;
