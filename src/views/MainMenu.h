@@ -22,5 +22,4 @@ namespace shahu{
     };
 }
 
-
 #endif //SHAHU_MAINMENU_H

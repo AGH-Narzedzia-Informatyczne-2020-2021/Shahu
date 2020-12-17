@@ -24,6 +24,7 @@ bool MainMenu::render() {
     al_draw_bitmap(button2,x[1],y[1],0);
     al_draw_bitmap(button3,x[2],y[2],0);
 
+
     return true;
 }
 
