@@ -32,17 +32,18 @@ bool MainMenu::click(float a, float b){
         button1 = al_load_bitmap("../assets/menu/Przycisk_graj_wcisniety.png");
         return false;
     }
-    if((x[1]<=a&&a<=x[1]+130)&&(y[1]<=b&&b<=y[1]+145)){
+    else if((x[1]<=a&&a<=x[1]+130)&&(y[1]<=b&&b<=y[1]+145)){
         button2 = al_load_bitmap("../assets/menu/ustawienia_wcisniete.png");
         return false;
     }
-    if(x[2]<=a&&a<=x[2]+300&&y[2]<=b&&b<=y[2]+150){
+    else if(x[2]<=a&&a<=x[2]+300&&y[2]<=b&&b<=y[2]+150){
         button3 = al_load_bitmap("../assets/menu/wyjdz_wcisniete.png");
         al_draw_bitmap(button3,x[2],y[2],0);
         al_flip_display();
         _sleep(3);
         return true;
     }
+    else return false;
 
 }
 
