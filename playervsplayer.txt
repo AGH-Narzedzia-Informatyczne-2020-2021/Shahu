@@ -34,14 +34,6 @@ int castleBlackLeft=0;                          //if 0 maybe we can do long blac
 int castleBlackRight=0;                         //if 0 maybe we can do short black castle
 int castleBlackKing=0;                          //if 0 we can do black castle
 
-//for minimax algorithm
-int castleWhiteLeftV1=0;                          //if 0 maybe we can do long white castle
-int castleWhiteRightV1=0;                         //if 0 maybe we can do short white castle
-int castleWhiteKingV1=0;                          //if 0 we can do white castle
-int castleBlackLeftV1=0;                          //if 0 maybe we can do long black castle
-int castleBlackRightV1=0;                         //if 0 maybe we can do short black castle
-int castleBlackKingV1=0;                          //if 0 we can do black castle
-
 //tells if we can do a flight kill
 int whiteFlight[8]={1,1,1,1,1,1,1,1};           //only if certain whiteFlight=1 we can kill white in flight on that width
 char blackFlight[8]="PPPPPPPP";                 //only if certain blackFlight=P we can kill black in flight on that width
@@ -190,14 +182,14 @@ int rating(char b[8][8]){
 //for minimax algorithm
 //rating the board
 int ratingV1(char b[8][8]){
-    int heuristics[8][8]={{100,100,100,100,100,100,100,100},
-                          {100,120,120,120,120,120,120,100},
-                          {100,120,140,140,140,140,120,100},
-                          {100,120,140,160,160,140,120,100},
-                          {100,120,140,160,160,140,120,100},
-                          {100,120,140,140,140,140,120,100},
-                          {100,120,120,120,120,120,120,100},
-                          {100,100,100,100,100,100,100,100},};
+    static int heuristics[8][8]={{100,100,100,100,100,100,100,100},
+                                {100,120,120,120,120,120,120,100},
+                                {100,120,140,140,140,140,120,100},
+                                {100,120,140,160,160,140,120,100},
+                                {100,120,140,160,160,140,120,100},
+                                {100,120,140,140,140,140,120,100},
+                                {100,120,120,120,120,120,120,100},
+                                {100,100,100,100,100,100,100,100},};
     int BlackKing=0, WhiteKing=0;
     int sum=0;
     int i, j;
@@ -1157,7 +1149,7 @@ int whiteCorrectMoves(int preMove, char afterMove, int i, int j, int k, int l){
     int temp, temp1;
     if (preMove=='1'){//pawn moves, 1 forward, kill slant
         if (i==6){
-            if (k==i-2 && l==j && afterMove==' ' || k==i-1 && j==l && afterMove==' '){
+            if (k==i-2 && l==j && afterMove==' ' && board[5][j]==' ' || k==i-1 && j==l && afterMove==' '){
                 return 1;
             }
         }
@@ -1473,7 +1465,7 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
     int temp, temp1;
     if (preMove=='P'){//pawn moves, 1 forward, kill slant
         if (i==1){
-            if (k==i+2 && l==j && afterMove==' ' && board[5][j]==' ' || k==i+1 && j==l && afterMove==' '){
+            if (k==i+2 && l==j && afterMove==' ' && board[2][j]==' ' || k==i+1 && j==l && afterMove==' '){
                 return 1;
             }
         }
@@ -1787,12 +1779,19 @@ int blackCorrectMoves(char preMove, int afterMove, int i, int j, int k, int l){
 //x1 and y1 are used to remember where is the white king
 //x2 and y2 are used to remember where piece is
 //count is used to remember how big is free space between king and piece
-int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l){
+int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l, char b[8][8], int kc){
     char tempBoard[8][8];
     int x, y, z, c, x1, y1, x2, y2, count;
     for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
         for (y = 0; y < 8; y++) {
             tempBoard[x][y]=board[x][y];
+        }
+    }
+    if (kc==2){
+        for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
+            for (y = 0; y < 8; y++) {
+                tempBoard[x][y]=b[x][y];
+            }
         }
     }
     tempBoard[i][j]=' ';                        //cleaning the place before move
@@ -2155,12 +2154,19 @@ int checkTheCheckOnWhite(int preMove, char afterMove, int i, int j, int k, int l
 //x1 and y1 are used to remember where is the black king
 //x2 and y2 are used to remember where piece is
 //count is used to remember how big is free space between king and piece
-int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l){
+int checkTheCheckOnBlack(char preMove, int afterMove, int i, int j, int k, int l, char b[8][8], int kc){
     char tempBoard[8][8];
     int x, y, z, c, x1, y1, x2, y2, count;
     for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
         for (y = 0; y < 8; y++) {
             tempBoard[x][y]=board[x][y];
+        }
+    }
+    if (kc==2){
+        for (x = 0; x < 8; x++) {                   //copying the board to tempBoard
+            for (y = 0; y < 8; y++) {
+                tempBoard[x][y]=b[x][y];
+            }
         }
     }
     tempBoard[i][j]=' ';                        //cleaning the place before move
@@ -2558,7 +2564,7 @@ void blackMove(char b[8][8]){
                 afterMove = b[k][l];
                 //check if player want to make correct move
                 //and check if there is no check on white after that move
-                if (blackCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnBlack(preMove, afterMove, i, j, k, l)==0) {
+                if (blackCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnBlack(preMove, afterMove, i, j, k, l, board, 1)==0) {
                     //making the move
                     b[k][l] = preMove;
                     //this short loop is used to switch black pawn by running blackPawnSwitch function
@@ -2615,7 +2621,7 @@ void whiteMove(char b[8][8]){
                 afterMove = b[k][l];
                 //check if player want to make correct move
                 //and check if there is no check on white after that move
-                if (whiteCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnWhite(preMove, afterMove, i, j, k, l)==0) {
+                if (whiteCorrectMoves(preMove, afterMove, i, j, k, l)==1 && checkTheCheckOnWhite(preMove, afterMove, i, j, k, l, board, 1)==0) {
                     //making the move
                     b[k][l] = preMove;
                     //this short loop is used to switch white pawn by running whitePawnSwitch function
@@ -2650,7 +2656,7 @@ void whiteMove(char b[8][8]){
     xd++;
 }
 
-int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int turn, int alfa, int beta) {
+int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int turn){//, int alfa, int beta) {
     int result = ratingV1(b), maxResult, minResult, i, j, k, l, afterMoveBlack, preMoveWhite, x, y;
     int ptmp, qtmp, rtmp, stmp;
     char preMoveBlack, afterMoveWhite, before;
@@ -2669,11 +2675,11 @@ int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int tur
                                 b[k][l] == '9' || b[k][l] == ' ') {
                                 afterMoveBlack = b[k][l];
                                 if (blackCorrectMoves(preMoveBlack, afterMoveBlack, i, j, k, l) == 1 &&
-                                    checkTheCheckOnBlack(preMoveBlack, afterMoveBlack, i, j, k, l) == 0) {
+                                    checkTheCheckOnBlack(preMoveBlack, afterMoveBlack, i, j, k, l, b, 2) == 0) {
                                     b[k][l] = preMoveBlack;
                                     b[i][j] = ' ';
                                     //castleCheckBlackV1(btemp);              //check if black can do a castle in his move
-                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn, alfa, beta);
+                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn);//, alfa, beta);
                                     b[i][j] = preMoveBlack;
                                     b[k][l] = afterMoveBlack;
                                     if (result>maxResult) {
@@ -2683,16 +2689,19 @@ int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int tur
                                         *r = k;
                                         *s = l;
                                     }
-                                    if(maxResult>alfa){
+                                    /*if(maxResult>alfa){
                                         alfa=maxResult;
                                     }
                                     if(beta<=alfa){
-                                        break;
-                                    }
+                                        continue;
+                                    }*/
                                 }
                             }
                         }
                     }
+                }
+                if(b[i][j]==' '){
+                    continue;
                 }
             }
         }
@@ -2710,11 +2719,11 @@ int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int tur
                                 b[k][l] == 'H' || b[k][l] == 'P') {
                                 afterMoveWhite = b[k][l];
                                 if (whiteCorrectMoves(preMoveWhite, afterMoveWhite, i, j, k, l) == 1 &&
-                                    checkTheCheckOnWhite(preMoveWhite, afterMoveWhite, i, j, k, l) == 0) {
+                                    checkTheCheckOnWhite(preMoveWhite, afterMoveWhite, i, j, k, l, b, 2) == 0) {
                                     b[k][l] = preMoveWhite;
                                     b[i][j] = ' ';
                                     //castleCheckWhiteV1(btemp);             //check if white can do a castle in his next move
-                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn, alfa, beta);
+                                    result = minimaxBlack(b, &ptmp, &qtmp, &rtmp, &stmp, deep-1, !turn);//, alfa, beta);
                                     b[i][j] = preMoveWhite;
                                     b[k][l] = afterMoveWhite;
                                     if (result < minResult) {
@@ -2723,17 +2732,20 @@ int minimaxBlack(char b[8][8], int *p, int *q, int *r, int *s, int deep, int tur
                                         *q = j;
                                         *r = k;
                                         *s = l;
-                                    }
+                                    }/*
                                     if(minResult<beta){
                                         beta=minResult;
                                     }
                                     if(beta<=alfa){
-                                        break;
-                                    }
+                                        continue;
+                                    }*/
                                 }
                             }
                         }
                     }
+                }
+                if(b[i][j]==' '){
+                    continue;
                 }
             }
         }
@@ -2775,23 +2787,29 @@ int main() {
                 whiteFlightBeat(board);                         //check if black can do flight kill on white after his move
                 castleCheckBlack(board);                        //check if black can do a castle in his move
                 blackFlightBeatBeforeMove(board);               //check if white will have possibility to do flight kill on black after his move
-                minimaxBlack(board, &p, &q, &r, &s, A, 1, 1000*LOSE, 1000*WIN);   //black move
+                minimaxBlack(board, &p, &q, &r, &s, A, 1);//, 1000*LOSE, 1000*WIN);   //black move
                 printf("PC: (%d,%d)-->(%d,%d)\n", p, q, r, s);
-                before=board[p][q];
-                board[p][q]=' ';
-                board[r][s]=before;
-                if (p==0 && q==4 && r==0 && s==6){
-                    board[0][5]='W';                                                        //moove the rook
-                    board[0][7]=' ';                                                        //clean the board
-                }
-                if (p==0 && q==4 && r==0 && s==2) {
-                    board[0][3] = 'W';                                                        //moove the rook
-                    board[0][0] = ' ';                                                        //clean the board
-                }
-                for (x = 0; x < 8; x++) {
-                    if (board[7][x] == 'P') {
-                        blackPawnSwitch(r, s);
+                if (board[p][q]!=' ') {
+                    before = board[p][q];
+                    board[p][q] = ' ';
+                    board[r][s] = before;
+                    if (p == 0 && q == 4 && r == 0 && s == 6) {
+                        board[0][5] = 'W';                                                        //moove the rook
+                        board[0][7] = ' ';                                                        //clean the board
                     }
+                    if (p == 0 && q == 4 && r == 0 && s == 2) {
+                        board[0][3] = 'W';                                                        //moove the rook
+                        board[0][0] = ' ';                                                        //clean the board
+                    }
+                    for (x = 0; x < 8; x++) {
+                        if (board[7][x] == 'P') {
+                            blackPawnSwitch(r, s);
+                        }
+                    }
+                }
+                else{
+                    printf("PC SURRENDER, YOU WON!");
+                    return 0;
                 }
                 castleCheckWhite(board);                        //check if white can do a castle in his next move
                 castleCheckBlack(board);                        //check if black can do a castle in his next move
